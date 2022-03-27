@@ -7,9 +7,9 @@
 // It is possible to combine both code into a single source file that will compile properly on Desktop and using Emscripten.
 // See https://github.com/ocornut/imgui/pull/2492 as an example on how to do just that.
 
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_sdl.h"
+#include "../imgui/imgui_impl_opengl3.h"
 #include <stdio.h>
 #include <emscripten.h>
 #include <SDL.h>
