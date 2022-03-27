@@ -23,6 +23,15 @@
     <ClCompile Include="..\external\imgui\imgui_impl_glfw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\StackerDemo.cpp">
+      <Filter>imstacker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\StackerUI.cpp">
+      <Filter>imstacker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CppStackerBox.cpp">
+      <Filter>imstacker</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -30,6 +39,9 @@
     </Filter>
     <Filter Include="glfw">
       <UniqueIdentifier>{834a64f9-8e31-4f17-a82a-82e309de46f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imstacker">
+      <UniqueIdentifier>{69c52001-39e3-4fdf-8364-0f0c50b0a053}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -59,6 +71,12 @@
     </ClInclude>
     <ClInclude Include="..\external\imgui\imgui_impl_glfw.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CppStackerBox.h">
+      <Filter>imstacker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\StackerUI.h">
+      <Filter>imstacker</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

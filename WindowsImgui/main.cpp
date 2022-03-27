@@ -3,9 +3,9 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
-#include "../external/imgui/imgui.h"
-#include "../external/imgui/imgui_impl_glfw.h"
-#include "../external/imgui/imgui_impl_opengl3.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -116,6 +116,9 @@ int main(int, char**)
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     if (show_demo_window)
       ImGui::ShowDemoWindow(&show_demo_window);
+
+    void stacker_demo();
+    stacker_demo();
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
