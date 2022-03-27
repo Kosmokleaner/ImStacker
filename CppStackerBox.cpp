@@ -3,9 +3,13 @@
 #include <assert.h>
 #include "imgui.h"
 
-// We rely on string literate compare for simpler code.
-// warning C4130 : '==' : logical operation on address of string constant
-#pragma warning( disable : 4130 )
+#ifdef WIN32
+  // We rely on string literate compare for simpler code.
+  // warning C4130 : '==' : logical operation on address of string constant
+  #pragma warning( disable : 4130 )
+#else
+  #define	sprintf_s(buffer, buffer_size, stringbuffer, ...) (sprintf(buffer, stringbuffer, __VA_ARGS__))
+#endif
 
 // literal (number, slider): bool, int, float, string, color, bitmap, struct? float slider
 // input: time, pixelpos, camera
@@ -45,7 +49,7 @@ void imguiToolTip(const char* tooltip) {
         ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.8f, 0.8f, 0.2f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
-        ImGui::SetTooltip(tooltip);
+        ImGui::SetTooltip("%s", tooltip);
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(1);
     }
@@ -131,7 +135,7 @@ void CppStackerBox::drawBox(const StackerUI& stackerUI, const ImVec2 minR, const
     const char* nodeName = enumToCStr(nodeType);
     ImVec2 textSize = ImGui::CalcTextSize(nodeName);
     ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - textSize.x) / 2, minR.y + (sizeR.y - textSize.y) / 2));
-    ImGui::Text(nodeName);
+    ImGui::TextUnformatted(nodeName);
 }
 
 bool CppStackerBox::load(const rapidjson::Document::ValueType& doc) {

@@ -3,9 +3,13 @@
 #include "rapidjson/prettywriter.h"
 #include "StackerUI.h"
 #include <assert.h>
+#include <math.h> // floorf
+#include <sys/stat.h>
 
-// warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-#pragma warning( disable : 4996)
+#ifdef WIN32
+  // warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  #pragma warning( disable : 4996)
+#endif
 
 using namespace rapidjson;
 
@@ -542,7 +546,7 @@ bool StackerUI::isSelected(const int32 id) const {
 
 
 void StackerUI::selectObject(const int32 id, const bool shift) {
-    const bool isThisSelected = isSelected(id);
+//    const bool isThisSelected = isSelected(id);
 
     auto itFind = std::find(selectedObjects.begin(), selectedObjects.end(), id);
 
@@ -688,7 +692,7 @@ void StackerUI::findChildren(const int32 Id, std::vector<StackerBox*>& outChildr
 
     const int32 lineAbove = ref.rect.y - 1;
     const uint32 width = getBitmapWidth();
-    const uint32 height = getBitmapHeight();
+//    const uint32 height = getBitmapHeight();
     const uint32 startIndex = ref.rect.x + lineAbove * width - (bitmapBounds[0] + bitmapBounds[1] * width);
 
     for (int32 i = 0, count = ref.rect.width; i < count; ++i) {

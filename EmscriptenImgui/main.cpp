@@ -130,6 +130,9 @@ static void main_loop(void* arg)
     if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
 
+    void stacker_demo();
+    stacker_demo();
+
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
     {
         static float f = 0.0f;
