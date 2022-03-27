@@ -6,7 +6,7 @@
 #include <math.h> // floorf
 #include <sys/stat.h>
 
-#ifdef WIN32
+#ifdef _WIN32
   // warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   #pragma warning( disable : 4996)
 #endif

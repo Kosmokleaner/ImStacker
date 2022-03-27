@@ -3,7 +3,7 @@
 #include <assert.h>
 #include "imgui.h"
 
-#ifdef WIN32
+#ifdef _WIN32
   // We rely on string literate compare for simpler code.
   // warning C4130 : '==' : logical operation on address of string constant
   #pragma warning( disable : 4130 )
