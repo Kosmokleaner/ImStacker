@@ -3,9 +3,9 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
-#include "../imgui/imgui.h"
-#include "../imgui/imgui_impl_glfw.h"
-#include "../imgui/imgui_impl_opengl3.h"
+#include "../external/imgui/imgui.h"
+#include "../external/imgui/imgui_impl_glfw.h"
+#include "../external/imgui/imgui_impl_opengl3.h"
 #include <stdio.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>

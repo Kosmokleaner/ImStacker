@@ -2,25 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\imgui\imgui_impl_opengl3.cpp">
+    <ClCompile Include="..\external\imgui\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui\imgui_tables.cpp">
+    <ClCompile Include="..\external\imgui\imgui_tables.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui\imgui_widgets.cpp">
+    <ClCompile Include="..\external\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui\imgui.cpp">
+    <ClCompile Include="..\external\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui\imgui_demo.cpp">
+    <ClCompile Include="..\external\imgui\imgui_demo.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui\imgui_draw.cpp">
+    <ClCompile Include="..\external\imgui\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\imgui\imgui_impl_glfw.cpp">
+    <ClCompile Include="..\external\imgui\imgui_impl_glfw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,42 +33,42 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\imgui\imgui_impl_glfw.h">
+    <ClInclude Include="..\external\imgui\imgui_impl_opengl3.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imgui_impl_opengl3.h">
+    <ClInclude Include="..\external\imgui\imgui_impl_opengl3_loader.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imgui_internal.h">
+    <ClInclude Include="..\external\imgui\imgui_internal.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imstb_rectpack.h">
+    <ClInclude Include="..\external\imgui\imstb_rectpack.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imstb_textedit.h">
+    <ClInclude Include="..\external\imgui\imstb_textedit.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imstb_truetype.h">
+    <ClInclude Include="..\external\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imconfig.h">
+    <ClInclude Include="..\external\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imgui.h">
+    <ClInclude Include="..\external\imgui\imgui.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\imgui\imgui_impl_opengl3_loader.h">
+    <ClInclude Include="..\external\imgui\imgui_impl_glfw.h">
       <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\glfw\lib-vc2019\glfw3_mt.lib">
+    <Library Include="..\external\glfw\lib-vc2019\glfw3dll.lib">
       <Filter>glfw</Filter>
     </Library>
-    <Library Include="..\glfw\lib-vc2019\glfw3dll.lib">
+    <Library Include="..\external\glfw\lib-vc2019\glfw3.lib">
       <Filter>glfw</Filter>
     </Library>
-    <Library Include="..\glfw\lib-vc2019\glfw3.lib">
+    <Library Include="..\external\glfw\lib-vc2019\glfw3_mt.lib">
       <Filter>glfw</Filter>
     </Library>
   </ItemGroup>
