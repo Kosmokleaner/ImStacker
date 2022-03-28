@@ -747,7 +747,7 @@ void StackerUI::buildOrder() {
         order[i] = i;
     ProcessingSortOrder processingSortOrder;
     processingSortOrder.data = stackerBoxes.data();
-//    std::sort(order.begin(), order.end(), processingSortOrder);
+    std::sort(order.begin(), order.end(), processingSortOrder);
 }
 
 
