@@ -7,6 +7,8 @@ enum DataType {
     EDT_Unknown,
     EDT_Int,
     EDT_Float,
+// --------------
+    EDT_MAX,
 };
 
 // index is serialized so only add in end
@@ -47,13 +49,14 @@ public:
 
     // interface StackerBox ---------------------------------
 
-    virtual const char* getType() const { return "CppStackerBox"; }
-    virtual void imGui();
-    virtual bool isVariable() const { return false; }
-    virtual bool generateCode(GenerateCodeContext& context);
-    virtual bool load(const rapidjson::Document::ValueType& doc);
-    virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const;
-    virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR);
+    virtual const char* getType() const override { return "CppStackerBox"; }
+    virtual void imGui() override;
+    virtual bool isVariable() const override { return false; }
+    virtual bool generateCode(GenerateCodeContext& context) override;
+    virtual bool load(const rapidjson::Document::ValueType& doc) override;
+    virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const override;
+    virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) override;
+    virtual void validate() const override;
 
 private:
     static const char* getType(DataType dataType);
@@ -61,7 +64,7 @@ private:
 
 // -------------------------------------------------------------------
 
-class CppStackerBoxFloat : public StackerBox {
+class CppStackerBoxFloat : public CppStackerBox {
 public:
     float value = 0;
     float minSlider = 0.0f;

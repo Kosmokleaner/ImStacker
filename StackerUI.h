@@ -66,6 +66,9 @@ public:
     virtual bool load(const rapidjson::Document::ValueType& doc);
     //
     virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) { (void)stackerUI; (void)minR; (void)maxR; }
+
+    // for debugging
+    virtual void validate() const {}
 };
 
 // --------------------------------------------------------------------------------

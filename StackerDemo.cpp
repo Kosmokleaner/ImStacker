@@ -19,6 +19,7 @@ void init() {
       }
       else {
         CppStackerBox* el = new CppStackerBox;
+        el->validate();
         el->rect = rect;
         el->nodeType = NT_Add;
         el->name = "Node";

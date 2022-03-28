@@ -572,6 +572,8 @@ void StackerUI::drawBoxes(const ImVec2 offset, int32 hoverObjectId, const uint32
     for (const int32 id : order) {
         auto& ref = *stackerBoxes[id];
 
+        ref.validate();
+
         ImVec2 minR((float)ref.rect.x * scale + offset.x, (float)ref.rect.y * scale + offset.y);
         ImVec2 sizeR((float)ref.rect.width * scale, (float)ref.rect.height * scale);
         ImVec2 maxR(minR.x + sizeR.x, minR.y + sizeR.y);
@@ -638,6 +640,8 @@ void StackerUI::drawBoxes(const ImVec2 offset, int32 hoverObjectId, const uint32
         }
 
         ImGui::PopID();
+
+        ref.validate();
     }
 }
 
@@ -743,13 +747,14 @@ void StackerUI::buildOrder() {
         order[i] = i;
     ProcessingSortOrder processingSortOrder;
     processingSortOrder.data = stackerBoxes.data();
-    std::sort(order.begin(), order.end(), processingSortOrder);
+//    std::sort(order.begin(), order.end(), processingSortOrder);
 }
 
 
 void StackerUI::generateCode(const bool fullMode) {
 
     GenerateCodeContext context;
+    context.params.reserve(1024);
 
     if (fullMode) {
         generatedCode.clear();
@@ -760,9 +765,15 @@ void StackerUI::generateCode(const bool fullMode) {
         int32 id = *it;
         auto& ref = *stackerBoxes[id];
 
+        ref.validate();
+
         findChildren(id, context.params);
 
+        ref.validate();
+
         ref.compileError = !ref.generateCode(context);
+
+        ref.validate();
     }
 }
 
@@ -844,14 +855,16 @@ void StackerUI::propertiesUI() {
     // todo: make UI not in a window so it can be combined with other UI
     ImGui::Begin("Stacker Properties");
 
-    uint32 index = 0;
-    for (auto it = selectedObjects.begin(); it != selectedObjects.end(); ++it, ++index) {
-        auto& ref = *stackerBoxes[*it];
+    for (auto it = selectedObjects.begin(); it != selectedObjects.end(); ++it) {
+        const uint32 index = *it;
+        auto& ref = *stackerBoxes[index];
 
-        if (index)
+        ref.validate();
+
+        if (it != selectedObjects.begin())
             ImGui::Separator();
 
-        ImGui::PushID(*it);
+        ImGui::PushID(index);
         ref.imGui();
         ImGui::PopID();
     }

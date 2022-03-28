@@ -123,11 +123,18 @@ const char* CppStackerBox::getType(DataType dataType) {
 }
 
 void CppStackerBox::imGui() {
+    validate();
     ImGui::TextUnformatted(getType(dataType));
     imguiInputText("name", name, 0);
+    validate();
+}
+
+void CppStackerBox::validate() const {
+    assert((uint32)dataType < EDT_MAX);
 }
 
 void CppStackerBox::drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) {
+    validate();
     (void)stackerUI;
 
     ImVec2 sizeR(maxR.x - minR.x, maxR.y - minR.y);
@@ -136,6 +143,7 @@ void CppStackerBox::drawBox(const StackerUI& stackerUI, const ImVec2 minR, const
     ImVec2 textSize = ImGui::CalcTextSize(nodeName);
     ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - textSize.x) / 2, minR.y + (sizeR.y - textSize.y) / 2));
     ImGui::TextUnformatted(nodeName);
+    validate();
 }
 
 bool CppStackerBox::load(const rapidjson::Document::ValueType& doc) {
@@ -154,6 +162,7 @@ bool CppStackerBox::load(const rapidjson::Document::ValueType& doc) {
         return false;
     }
 
+    validate();
     return true;
 }
 
@@ -168,36 +177,47 @@ void CppStackerBox::save(rapidjson::Document& d, rapidjson::Value& objValue) con
         objValue.AddMember("name", tmp, d.GetAllocator());
     }
     objValue.AddMember("dataType", dataType, d.GetAllocator());
+    validate();
 }
 
 bool CppStackerBox::generateCode(GenerateCodeContext& context) {
+    validate();
+
     char str[256];
 
     dataType = EDT_Unknown;
 
     if (!context.params.empty()) {
         dataType = ((CppStackerBox*)context.params[0])->dataType;
+        validate();
 
         // all same type?
         for (size_t i = 1, count = context.params.size(); i < count; ++i) {
             if (((CppStackerBox*)context.params[i])->dataType != dataType) {
                 dataType = EDT_Unknown;
+                validate();
                 return false;
             }
+            validate();
         }
+        validate();
     }
 
-    if (dataType == EDT_Unknown)
+    if (dataType == EDT_Unknown) {
+        validate();
         return false;
+    }
 
     // one or more inputs, all same dataType which is not EDT_Unknown
 
     if(nodeType == NT_Add) {
+        validate();
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d",
                 getType(dataType),
                 vIndex,
                 context.params[0]->vIndex);
+            validate();
             *context.code += str;
 
             for (size_t i = 1, count = context.params.size(); i < count; ++i) {
@@ -206,9 +226,11 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
                 *context.code += str;
             }
+            validate();
             sprintf_s(str, sizeof(str), "; // %s\n", name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -222,6 +244,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
                 name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -236,6 +259,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
                 name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -257,6 +281,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
             sprintf_s(str, sizeof(str), "; // %s\n", name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -270,6 +295,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
                 name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -284,6 +310,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
                 name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -297,6 +324,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
                 name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
@@ -310,9 +338,11 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
                 name.c_str());
             *context.code += str;
         }
+        validate();
         return true;
     }
 
+    validate();
     return false;
 }
 
