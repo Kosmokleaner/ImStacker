@@ -369,10 +369,12 @@ void CppStackerBoxFloat::drawBox(const StackerUI& stackerUI, const ImVec2 minR, 
 
     if(sliderSizeX > 0) {
         float sliderSizeY = 2.0f * style.FramePadding.y + ImGui::GetFontSize();
-        // bottom
-//        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + sizeR.y - sliderSizeY));
-        // center
-        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + (sizeR.y - sliderSizeY) / 2));
+
+        // centerx, bottom
+        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + sizeR.y - sliderSizeY));
+        // centerx, centery
+//        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + (sizeR.y - sliderSizeY) / 2));
+
         ImGui::SetNextItemWidth(sliderSizeX);
         ImGui::SliderFloat("", &value, minSlider, maxSlider);
     }

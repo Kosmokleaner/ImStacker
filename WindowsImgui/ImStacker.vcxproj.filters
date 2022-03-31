@@ -32,6 +32,9 @@
     <ClCompile Include="..\CppStackerBox.cpp">
       <Filter>imstacker</Filter>
     </ClCompile>
+    <ClCompile Include="..\ShaderBox.cpp">
+      <Filter>imstacker</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -76,6 +79,9 @@
       <Filter>imstacker</Filter>
     </ClInclude>
     <ClInclude Include="..\StackerUI.h">
+      <Filter>imstacker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ShaderBox.h">
       <Filter>imstacker</Filter>
     </ClInclude>
   </ItemGroup>

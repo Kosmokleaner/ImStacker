@@ -2,6 +2,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "StackerUI.h"
+#include "ShaderBox.h"
 #include <assert.h>
 #include <math.h> // floorf
 #include <sys/stat.h>
@@ -774,6 +775,10 @@ void StackerUI::generateCode(const bool fullMode) {
         ref.compileError = !ref.generateCode(context);
 
         ref.validate();
+
+        if(!ref.compileError) {
+            genShaderCode((generatedCode + "\nFragColor.r = v0;").c_str());
+        }
     }
 }
 

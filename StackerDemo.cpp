@@ -1,4 +1,3 @@
-
 #include "CppStackerBox.h"
 
 static StackerUI g_stackerUI;
