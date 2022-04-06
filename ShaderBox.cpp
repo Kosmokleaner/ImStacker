@@ -22,11 +22,11 @@ const char* fragment_shader_text0 =
 "#version 330 core\n"
 "out vec4 FragColor; \n"
 "\n"
-"in vec4 vertexColor;\n"
+"in vec4 vertexColor; // red\n"
 "\n"
 "void main()\n"
 "{\n"
-"    FragColor = vertexColor; \n";
+"   FragColor = vertexColor;\n";
 
 const char* fragment_shader_text1 =
 "}\n"

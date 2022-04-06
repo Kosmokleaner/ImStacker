@@ -783,6 +783,8 @@ void StackerUI::generateCode(const bool fullMode) {
         ref.validate();
     }
     if (fullMode) {
+        // trim right
+        generatedCode.erase(generatedCode.find_last_not_of("\t ") + 1);
         generatedCode += fragment_shader_text1;
         recompileShaders(generatedCode.c_str(), warningsAndErrors);
     }

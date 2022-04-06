@@ -191,6 +191,10 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
     dataType = EDT_Unknown;
 
+    if (context.code) {
+      *context.code += "   ";
+    }
+  
     if (!context.params.empty()) {
         dataType = ((CppStackerBox*)context.params[0])->dataType;
         validate();
