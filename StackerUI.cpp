@@ -294,6 +294,10 @@ void StackerUI::draw() {
 
     contextMenu(mousePosX, mousePosY);
 
+    if(ImGui::IsKeyPressed(ImGuiKey_Delete, true)) {
+      clipboardCut();
+    }
+
     buildOrder();
 
     if (contextMenuIsOpen) {
