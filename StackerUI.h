@@ -75,17 +75,18 @@ public:
 
 class StackerUI {
 public:
+    // all mthods need to be implemented as thi class is also used as nUll implementation
     struct IAppConnection {
         virtual ~IAppConnection() {}
-        virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) = 0;
+        virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {}
         // @param className must not be 0
         // @return 0 if failed
-        virtual StackerBox* createNode(const char* className) = 0;
-    };
-    struct NullAppConnection : public IAppConnection {
-      virtual ~NullAppConnection() {}
-      virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {}
-      virtual StackerBox* createNode(const char* className) { return nullptr; }
+        virtual StackerBox* createNode(const char* className) { return nullptr; }
+        virtual void startCompile() {}
+        virtual std::string* code() { return nullptr; }
+        virtual void endCompile() {};
+        // @return 0 if there are no warnings and errors
+        virtual const char* getWarningsAndErrors() { return nullptr; }
     };
 
     int32 scrollingX = 0;
@@ -115,9 +116,6 @@ public:
     // for code generation and drawing
     // once setup same size as stackerBoxes, values are id into stackerBoxes[]
     std::vector<int32> order;
-
-    std::string generatedCode;
-    std::string warningsAndErrors;
 
     // UI customizations
     const int32 scale = 32;
@@ -157,8 +155,8 @@ public:
     void clipboardPaste();
 
 private:
-    NullAppConnection nullAppConnection;
-    // never 0
+    IAppConnection nullAppConnection;
+    // never 0 so error handling is simpler
     IAppConnection* appConnection = &nullAppConnection;
 
     // [x + y * width], used by buildGraph(), -1:no used, -2:inside box after first line, otherwise index into stackerBoxes[]

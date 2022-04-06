@@ -95,7 +95,13 @@ public:
 
 class CppAppConnection : public StackerUI::IAppConnection {
 public:
+  std::string generatedCode;
+  std::string warningsAndErrors;
 
-    virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect);
-    virtual StackerBox* createNode(const char* className);
+  virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect);
+  virtual StackerBox* createNode(const char* className);
+  virtual const char* getWarningsAndErrors() { return warningsAndErrors.c_str(); }
+  virtual void startCompile();
+  virtual void endCompile();
+  virtual std::string* code() { return &generatedCode; }
 };

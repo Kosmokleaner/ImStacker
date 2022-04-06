@@ -108,10 +108,6 @@ void StackerUI::reset() {
 bool StackerUI::loadFromBuffer(const std::vector<char>& fileBlob) {
     reset();
 
-    assert(appConnection);
-    if (!appConnection)
-        return false;
-
     Document d;
     d.Parse(fileBlob.data(), fileBlob.size());
 
@@ -228,8 +224,7 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
 
             StackerBoxRect stackerBoxRect = { selectStartX, selectStartY, newHalfSize * 2 + 1, 1 };
 
-            if(appConnection)
-                appConnection->openContextMenu(*this, stackerBoxRect);
+            appConnection->openContextMenu(*this, stackerBoxRect);
         }
         else {
             if (ImGui::MenuItem("Cut", "CTRL+X")) {
@@ -255,7 +250,6 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
 void StackerUI::setAppConnection(IAppConnection* inAppConnection) {
     appConnection = inAppConnection ? inAppConnection : &nullAppConnection;
 }
-
 
 void StackerUI::draw() {
     ImGuiIO& io = ImGui::GetIO();
@@ -762,10 +756,11 @@ void StackerUI::generateCode(const bool fullMode) {
     context.params.reserve(1024);
 
     if (fullMode) {
-        generatedCode.clear();
-        generatedCode += fragment_shader_text0;
+        appConnection->startCompile();
+        std::string* code = appConnection->code();
+        assert(code);
 
-        context.code = &generatedCode;
+        context.code = code;
     }
 
     for (auto it = order.rbegin(), end = order.rend(); it != end; ++it) {
@@ -787,10 +782,7 @@ void StackerUI::generateCode(const bool fullMode) {
         ref.validate();
     }
     if (fullMode) {
-        // trim right
-        generatedCode.erase(generatedCode.find_last_not_of("\t ") + 1);
-        generatedCode += fragment_shader_text1;
-        recompileShaders(generatedCode.c_str(), warningsAndErrors);
+        appConnection->endCompile();
     }
 }
 
@@ -860,9 +852,13 @@ void StackerUI::generatedCodeUI() {
     if (ImGui::Button("  Generate  ")) {
         generateCode(true);
     }
-    ImGui::InputTextMultiline("Code", (char*)generatedCode.c_str(), generatedCode.size(), ImVec2(-FLT_MIN, 300.0f), ImGuiInputTextFlags_ReadOnly);
+    std::string* code = appConnection->code();
+    assert(code);
+
+    ImGui::InputTextMultiline("Code", (char*)code->c_str(), code->size(), ImVec2(-FLT_MIN, 300.0f), ImGuiInputTextFlags_ReadOnly);
     ImGui::TextUnformatted("Warnings / Errors");
-    ImGui::InputTextMultiline("Warnings / Errors", (char*)warningsAndErrors.c_str(), warningsAndErrors.size(), ImVec2(-FLT_MIN, 0.0f), ImGuiInputTextFlags_ReadOnly);
+    const char* warningsAndErrors = appConnection->getWarningsAndErrors();
+    ImGui::InputTextMultiline("Warnings / Errors", (char*)warningsAndErrors, 0, ImVec2(-FLT_MIN, 0.0f), ImGuiInputTextFlags_ReadOnly);
 
     ImGui::End();
 }

@@ -2,6 +2,7 @@
 #include <vector>
 #include <assert.h>
 #include "imgui.h"
+#include "ShaderBox.h"
 
 #ifdef _WIN32
   // We rely on string literate compare for simpler code.
@@ -62,6 +63,19 @@ StackerBox* CppAppConnection::createNode(const char* className) {
         return new CppStackerBoxConstant();
 
     return nullptr;
+}
+
+void CppAppConnection::startCompile() {
+  generatedCode.clear();
+  generatedCode += fragment_shader_text0;
+
+}
+
+void CppAppConnection::endCompile() {
+  // trim right
+  generatedCode.erase(generatedCode.find_last_not_of("\t ") + 1);
+  generatedCode += fragment_shader_text1;
+  recompileShaders(generatedCode.c_str(), warningsAndErrors);
 }
 
 void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {
