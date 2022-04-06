@@ -82,6 +82,11 @@ public:
         // @return 0 if failed
         virtual StackerBox* createNode(const char* className) = 0;
     };
+    struct NullAppConnection : public IAppConnection {
+      virtual ~NullAppConnection() {}
+      virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {}
+      virtual StackerBox* createNode(const char* className) { return nullptr; }
+    };
 
     int32 scrollingX = 0;
     int32 scrollingY = 0;
@@ -152,7 +157,9 @@ public:
     void clipboardPaste();
 
 private:
-    IAppConnection* appConnection = nullptr;
+    NullAppConnection nullAppConnection;
+    // never 0
+    IAppConnection* appConnection = &nullAppConnection;
 
     // [x + y * width], used by buildGraph(), -1:no used, -2:inside box after first line, otherwise index into stackerBoxes[]
     std::vector<int32> tempBitmap;

@@ -253,7 +253,7 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
 
 
 void StackerUI::setAppConnection(IAppConnection* inAppConnection) {
-    appConnection = inAppConnection;
+    appConnection = inAppConnection ? inAppConnection : &nullAppConnection;
 }
 
 
