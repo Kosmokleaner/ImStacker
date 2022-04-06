@@ -37,9 +37,6 @@ bool imguiInputText(const char* label, std::string& str, ImGuiInputTextFlags fla
     return ImGui::InputText(label, (char*)str.c_str(), str.capacity() + 1, flags, InputTextCallback, (void*)&str);
 }
 
-CppStackerBox::CppStackerBox() {
-}
-
 // @param tooltip must not be 0
 void imguiToolTip(const char* tooltip) {
     assert(tooltip);
@@ -79,16 +76,19 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     } \
     imguiToolTip(tooltip);
 
-#define ENTRY_FLOAT(inName, tooltip) \
+// @param inType e.g. EDT_Float
+#define ENTRY_CONSTANT(inName, inType, tooltip) \
     if(ImGui::MenuItem(#inName, nullptr)) { \
         auto obj = new CppStackerBoxConstant(); \
+        obj->dataType = inType;\
         obj->rect = rect; \
         stackerUI.stackerBoxes.push_back(obj); \
     } \
     imguiToolTip(tooltip);
 
 //    ENTRY(IntVariable, "Integer variable (no fractional part)");
-    ENTRY_FLOAT(FloatVariable, "Floating point variable (with fractional part)");
+    ENTRY_CONSTANT(FloatConstant, EDT_Float, "Floating point constant (with fractional part)");
+    ENTRY_CONSTANT(Vec4Constant, EDT_Vec4, "Vec4 constant");
     ImGui::Separator();
     ENTRY(Add, "Sum up multiple inputs of same type");
     ENTRY(Sub, "Subtract two numbers or negate one number");
@@ -111,7 +111,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     }
 }
 
-const char* CppStackerBox::getType(DataType dataType) {
+const char* CppStackerBox::getTypeName(DataType dataType) {
     switch(dataType) {
         case EDT_Unknown : return "unknown";
         case EDT_Int: return "int";
@@ -128,7 +128,7 @@ const char* CppStackerBox::getType(DataType dataType) {
 
 void CppStackerBox::imGui() {
     validate();
-    ImGui::TextUnformatted(getType(dataType));
+    ImGui::TextUnformatted(getTypeName(dataType));
     imguiInputText("name", name, 0);
     validate();
 }
@@ -218,7 +218,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         validate();
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex);
             validate();
@@ -242,7 +242,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if(context.params.size() == 1 && nodeType == NT_Sub) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d; // %s\n",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex,
                 name.c_str());
@@ -256,7 +256,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.params.size() == 2 && nodeType == NT_Sub) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d - v%d; // %s\n",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex,
                 context.params[1]->vIndex,
@@ -282,7 +282,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (nodeType == NT_Mul) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex);
             *context.code += str;
@@ -304,7 +304,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.params.size() == 1 && nodeType == NT_Div) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = 1.0f / v%d; // %s\n",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex,
                 name.c_str());
@@ -318,7 +318,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.params.size() == 2 && nodeType == NT_Div) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex,
                 context.params[1]->vIndex,
@@ -333,7 +333,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.params.size() == 1 && nodeType == NT_Sin) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = sin(v%d); // %s\n",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex,
                 name.c_str());
@@ -347,7 +347,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.params.size() == 1 && nodeType == NT_Cos) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = cos(v%d); // %s\n",
-                getType(dataType),
+                getTypeName(dataType),
                 vIndex,
                 context.params[0]->vIndex,
                 name.c_str());
@@ -366,17 +366,26 @@ bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
     char str[256];
 
     if (context.code) {
-        sprintf_s(str, sizeof(str), "float v%d = %f;\n",
+        if(dataType == EDT_Float) {
+          sprintf_s(str, sizeof(str), "%s v%d = %f;\n",
+              getTypeName(dataType),
+              vIndex,
+              value.x);
+          *context.code += str;
+        }
+        else {
+          assert(dataType == EDT_Vec4);
+          sprintf_s(str, sizeof(str), "%s v%d = vec4(%f, %f, %f, %f);\n",
+            getTypeName(dataType),
             vIndex,
-            value);
-        *context.code += str;
+            value.x, value.y, value.z, value.w);
+          *context.code += str;
+        }
     }
     return true;
 }
 
 void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) {
-    (void)stackerUI;
-
     ImVec2 sizeR(maxR.x - minR.x, maxR.y - minR.y);
     ImGuiStyle& style = ImGui::GetStyle();
 
@@ -391,7 +400,12 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
 //        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + (sizeR.y - sliderSizeY) / 2));
 
         ImGui::SetNextItemWidth(sliderSizeX);
-        ImGui::SliderFloat("", &value, minSlider, maxSlider);
+
+        if(dataType == EDT_Float)
+          ImGui::SliderFloat("", &value.x, minSlider, maxSlider);
+        else {
+          ImGui::ColorEdit4("", &value.x, 0);
+        }
     }
 }
 
@@ -400,7 +414,10 @@ bool CppStackerBoxConstant::load(const rapidjson::Document::ValueType& doc) {
     if (!StackerBox::load(doc))
         return false;
 
-    value = doc["value"].GetFloat();
+    value.x = doc["valueX"].GetFloat();
+    value.y = doc["valueY"].GetFloat();
+    value.z = doc["valueZ"].GetFloat();
+    value.w = doc["valueW"].GetFloat();
     minSlider = doc["minSlider"].GetFloat();
     maxSlider = doc["maxSlider"].GetFloat();
     return true;
@@ -410,7 +427,10 @@ void CppStackerBoxConstant::save(rapidjson::Document& d, rapidjson::Value& objVa
     // call parent
     StackerBox::save(d, objValue);
 
-    objValue.AddMember("value", value, d.GetAllocator());
+    objValue.AddMember("valueX", value.x, d.GetAllocator());
+    objValue.AddMember("valueY", value.y, d.GetAllocator());
+    objValue.AddMember("valueZ", value.z, d.GetAllocator());
+    objValue.AddMember("valueW", value.w, d.GetAllocator());
     objValue.AddMember("minSlider", minSlider, d.GetAllocator());
     objValue.AddMember("maxSlider", maxSlider, d.GetAllocator());
 }

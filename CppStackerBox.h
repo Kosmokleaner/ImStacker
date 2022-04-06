@@ -47,9 +47,6 @@ inline const char* enumToCStr(const ENodeType nodeType) {
 
 class CppStackerBox : public StackerBox {
 public:
-    // used by createNode()
-    CppStackerBox();
-
     // for user/debugging, not needed to function
     std::string name;
     //
@@ -68,15 +65,16 @@ public:
     virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) override;
     virtual void validate() const override;
 
-private:
-    static const char* getType(DataType dataType);
+protected:
+  // @return name used in generated code e.g. "vec4"
+  static const char* getTypeName(DataType dataType);
 };
 
 // -------------------------------------------------------------------
 
 class CppStackerBoxConstant : public CppStackerBox {
 public:
-    float value = 0;
+    ImVec4 value = {};
     float minSlider = 0.0f;
     float maxSlider = 1.0f;
 
