@@ -99,6 +99,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     ENTRY(Frac, "like HLSL frac() = x-floor(x)");
     ENTRY(Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
     ENTRY(Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
+    ENTRY(Output, "output vec4 as postprocess");
 
 #undef ENTRY
 
@@ -115,6 +116,9 @@ const char* CppStackerBox::getType(DataType dataType) {
         case EDT_Unknown : return "unknown";
         case EDT_Int: return "int";
         case EDT_Float: return "float";
+        case EDT_Vec2: return "vec2";
+        case EDT_Vec3: return "vec3";
+        case EDT_Vec4: return "vec4";
         default:
             assert(0);
     }
@@ -263,7 +267,18 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         return true;
     }
 
-    // multiply
+    if (context.params.size() == 1 && nodeType == NT_Output) {
+        if (context.code) {
+            sprintf_s(str, sizeof(str), "FragColor = v%d",
+                context.params[0]->vIndex);
+            *context.code += str;
+            sprintf_s(str, sizeof(str), "; // %s\n", name.c_str());
+            *context.code += str;
+        }
+        validate();
+        return true;
+    }
+
     if (nodeType == NT_Mul) {
         if (context.code) {
             sprintf_s(str, sizeof(str), "%s v%d = v%d",

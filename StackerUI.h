@@ -112,6 +112,7 @@ public:
     std::vector<int32> order;
 
     std::string generatedCode;
+    std::string warningsAndErrors;
 
     // UI customizations
     const int32 scale = 32;

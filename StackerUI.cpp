@@ -759,6 +759,8 @@ void StackerUI::generateCode(const bool fullMode) {
 
     if (fullMode) {
         generatedCode.clear();
+        generatedCode += fragment_shader_text0;
+
         context.code = &generatedCode;
     }
 
@@ -775,10 +777,10 @@ void StackerUI::generateCode(const bool fullMode) {
         ref.compileError = !ref.generateCode(context);
 
         ref.validate();
-
-        if(!ref.compileError) {
-            genShaderCode((generatedCode + "\nFragColor.r = v0;").c_str());
-        }
+    }
+    if (fullMode) {
+        generatedCode += fragment_shader_text1;
+        recompileShaders(generatedCode.c_str(), warningsAndErrors);
     }
 }
 
@@ -848,7 +850,10 @@ void StackerUI::generatedCodeUI() {
     if (ImGui::Button("  Generate  ")) {
         generateCode(true);
     }
-    ImGui::InputTextMultiline("Code", (char*)generatedCode.c_str(), generatedCode.size(), ImVec2(-FLT_MIN, 0.0f), ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputTextMultiline("Code", (char*)generatedCode.c_str(), generatedCode.size(), ImVec2(-FLT_MIN, 300.0f), ImGuiInputTextFlags_ReadOnly);
+    ImGui::TextUnformatted("Warnings / Errors");
+    ImGui::InputTextMultiline("Warnings / Errors", (char*)warningsAndErrors.c_str(), warningsAndErrors.size(), ImVec2(-FLT_MIN, 0.0f), ImGuiInputTextFlags_ReadOnly);
+
     ImGui::End();
 }
 

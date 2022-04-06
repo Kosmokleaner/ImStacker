@@ -3,8 +3,23 @@
 static StackerUI g_stackerUI;
 
 void init() {
+
   {
-    for (int32 i = 0; i < 5; ++i) {
+    StackerBoxRect rect;
+    rect.x = (int32)(rand() % 10);
+    rect.y = (int32)(rand() % 10);
+    rect.width = (int32)((rand() % 10) + 2);
+    rect.height = (int32)((rand() % 3) + 1);
+    CppStackerBox* el = new CppStackerBox;
+    el->validate();
+    el->rect = rect;
+    el->nodeType = NT_Output;
+    el->name = "Output";
+    g_stackerUI.stackerBoxes.push_back(el);
+  }
+/*
+  {
+    for (int32 i = 0; i < 1; ++i) {
       StackerBoxRect rect;
       rect.x = (int32)(rand() % 10);
       rect.y = (int32)(rand() % 10);
@@ -26,6 +41,7 @@ void init() {
       }
     }
   }
+*/
 
   static CppAppConnection cppAppConnection;
   g_stackerUI.setAppConnection(&cppAppConnection);

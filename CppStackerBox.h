@@ -3,19 +3,28 @@
 #include "StackerUI.h"
 
 // index is serialized
+// update CppStackerBox::getType() if you add a new entry
 enum DataType {
     EDT_Unknown,
     EDT_Int,
     EDT_Float,
+    EDT_Vec2,
+    EDT_Vec3,
+    EDT_Vec4,
 // --------------
     EDT_MAX,
 };
 
 // index is serialized so only add in end
+// update CppAppConnection::openContextMenu()
+//    and CppStackerBox::generateCode()
+//    and enumToCStr()
+// if you add a new entry
 enum ENodeType {
     NT_Unknown,
     NT_IntVariable, NT_FloatVariable,
     NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp,
+    NT_Output,
     // -----------------
     NT_NodeTypeTerminator
 };
@@ -25,7 +34,8 @@ inline const char* enumToCStr(const ENodeType nodeType) {
     const char* tab[] = {
         "Unknown",
         "IntVariable", "FloatVariable",
-        "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp"
+        "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp",
+        "Output",
     };
 
     if(nodeType < sizeof(tab) / sizeof(tab[0]))

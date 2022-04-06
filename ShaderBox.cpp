@@ -37,16 +37,35 @@ static GLuint g_program = 0;
 static GLuint g_vbo = 0;
 static GLuint g_idx = 0;
 
-void genShaderCode(const char* inCode) {
-    assert(inCode);
-    std::string temp;
+// If you get an error please report on GitHub. You may try different GL context version or GLSL version.
+// @param whatToCheck GL_LINK_STATUS for program or GL_COMPILE_STATUS for shaders
+static bool checkProgram(GLuint handle, GLuint whatToCheck, const char* desc, std::string& warningsAndErrors) {
+    warningsAndErrors.clear();
 
-    temp = fragment_shader_text0;
-    temp += inCode;
-    temp += fragment_shader_text1;
+    GLint status = 0, log_length = 0;
+    glGetProgramiv(handle, whatToCheck, &status);
+    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
+    if ((GLboolean)status == GL_FALSE) {
+        OutputDebugStringA("ERROR: ");
+        OutputDebugStringA(desc);
+        OutputDebugStringA("\n");
+    }
+    if (log_length > 1)
+    {
+        ImVector<char> buf;
+        buf.resize((int)(log_length + 1));
+        glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+        OutputDebugStringA(buf.begin());
+        warningsAndErrors = buf.begin();
+    }
+    return (GLboolean)status == GL_TRUE;
+}
+
+void recompileShaders(const char* inCode, std::string& warningsAndErrors) {
+    assert(inCode);
 
     GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* ptr = temp.data();
+    const char* ptr = inCode;
     glShaderSource(fragment_shader, 1, &ptr, NULL);
     glCompileShader(fragment_shader);
 
@@ -54,6 +73,7 @@ void genShaderCode(const char* inCode) {
     glAttachShader(g_program, vertex_shader);
     glAttachShader(g_program, fragment_shader);
     glLinkProgram(g_program);
+    checkProgram(g_program, GL_LINK_STATUS, "program", warningsAndErrors);
 }
 
 static void init() {
@@ -61,8 +81,11 @@ static void init() {
     glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
     glCompileShader(vertex_shader);
 
-
-    genShaderCode("");
+    std::string warningsAndErrors;
+    std::string shaderCode;
+    shaderCode += fragment_shader_text0;
+    shaderCode += fragment_shader_text1;
+    recompileShaders(shaderCode.c_str(), warningsAndErrors);
 
     const float r = 1.0f;
 
