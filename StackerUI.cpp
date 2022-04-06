@@ -778,6 +778,10 @@ void StackerUI::generateCode(const bool fullMode) {
 
         ref.validate();
 
+        if (context.code) {
+          *context.code += "   ";
+        }
+
         ref.compileError = !ref.generateCode(context);
 
         ref.validate();

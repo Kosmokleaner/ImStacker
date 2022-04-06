@@ -81,6 +81,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     if(ImGui::MenuItem(#inName, nullptr)) { \
         auto obj = new CppStackerBoxConstant(); \
         obj->dataType = inType;\
+        obj->name = #inName; \
         obj->rect = rect; \
         stackerUI.stackerBoxes.push_back(obj); \
     } \
@@ -99,6 +100,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     ENTRY(Frac, "like HLSL frac() = x-floor(x)");
     ENTRY(Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
     ENTRY(Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
+    ENTRY(FragCoord, "see OpenGL gl_FragCoord");
     ENTRY(Output, "output vec4 as postprocess");
 
 #undef ENTRY
@@ -189,12 +191,20 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
     char str[256];
 
-    dataType = EDT_Unknown;
-
-    if (context.code) {
-      *context.code += "   ";
+    if (context.params.size() == 0 && nodeType == NT_FragCoord) {
+      if (context.code) {
+        dataType = EDT_Vec4;
+        sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord;\n",
+          getTypeName(dataType),
+          vIndex);
+        *context.code += str;
+      }
+      validate();
+      return true;
     }
-  
+
+    dataType = EDT_Unknown;  
+
     if (!context.params.empty()) {
         dataType = ((CppStackerBox*)context.params[0])->dataType;
         validate();
@@ -209,6 +219,18 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
             validate();
         }
         validate();
+    }
+
+    if (context.params.size() == 0 && nodeType == NT_FragCoord) {
+      if (context.code) {
+        assert(dataType == EDT_Vec4);
+        sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord;",
+          getTypeName(dataType),
+          vIndex);
+        *context.code += str;
+      }
+      validate();
+      return true;
     }
 
     if (dataType == EDT_Unknown) {
@@ -393,24 +415,56 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
     ImVec2 sizeR(maxR.x - minR.x, maxR.y - minR.y);
     ImGuiStyle& style = ImGui::GetStyle();
 
-    float sliderSizeX = sizeR.x - stackerUI.scale * 2.0f;
+    float sliderSizeX = sizeR.x - stackerUI.scale * 1.0f;
 
     if(sliderSizeX > 0) {
-        float sliderSizeY = 2.0f * style.FramePadding.y + ImGui::GetFontSize();
+        float sliderSizeY = 1.0f * style.FramePadding.y + ImGui::GetFontSize();
+        float border = 2;
+
+        // centerx, top
+        if(maxR.y - minR.y > stackerUI.scale) {
+          ImVec2 s = ImGui::CalcTextSize(name.c_str());
+          ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - s.x) / 2, minR.y + border));
+          ImGui::TextUnformatted(name.c_str());
+        }
 
         // centerx, bottom
-        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + sizeR.y - sliderSizeY));
+        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + sizeR.y - sliderSizeY - border));
         // centerx, centery
 //        ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - sliderSizeX) / 2, minR.y + (sizeR.y - sliderSizeY) / 2));
 
         ImGui::SetNextItemWidth(sliderSizeX);
 
-        if(dataType == EDT_Float)
-          ImGui::SliderFloat("", &value.x, minSlider, maxSlider);
-        else {
-          ImGui::ColorEdit4("", &value.x, 0);
+        if(dataType == EDT_Float) {
+          char str[80];
+          sprintf_s(str, 80, "%.2f", value.x);
+          ImVec2 s = ImGui::CalcTextSize(str);
+          ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (sliderSizeX - s.x) / 2);
+//          ImGui::SliderFloat("", &value.x, minSlider, maxSlider);
+          ImGui::TextUnformatted(str);
+        } else {
+          // todo: show alpha as well
+          ImVec4 col3(value.x, value.y, value.z, 1.0f);
+          ImGui::PushStyleColor(ImGuiCol_Button, col3);
+          ImGui::PushStyleColor(ImGuiCol_ButtonHovered, col3);
+          ImGui::PushStyleColor(ImGuiCol_ButtonActive, col3);
+          ImGui::Button("", ImVec2(sliderSizeX, (float)stackerUI.connectorSize));
+          ImGui::PopStyleColor(3);
         }
     }
+}
+
+void CppStackerBoxConstant::imGui() {
+  CppStackerBox::imGui();
+
+  if (dataType == EDT_Float) {
+    ImGui::SliderFloat("Value", &value.x, minSlider, maxSlider);
+    ImGui::InputFloat("minValue", &minSlider);
+    ImGui::InputFloat("maxValue", &maxSlider);
+  }
+  else {
+    ImGui::ColorEdit4("Value", &value.x, 0);
+  }
 }
 
 bool CppStackerBoxConstant::load(const rapidjson::Document::ValueType& doc) {

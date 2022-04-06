@@ -23,6 +23,7 @@ const char* fragment_shader_text0 =
 "out vec4 FragColor; \n"
 "\n"
 "in vec4 vertexColor; // red\n"
+"in vec4 gl_FragCoord; // (pixel.x+0.5, pixel.y+0.5, z, w)\n"
 "\n"
 "void main()\n"
 "{\n"

@@ -24,6 +24,7 @@ enum ENodeType {
     NT_Unknown,
     NT_IntVariable, NT_FloatVariable,
     NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp,
+    NT_FragCoord,
     NT_Output,
     // -----------------
     NT_NodeTypeTerminator
@@ -35,6 +36,7 @@ inline const char* enumToCStr(const ENodeType nodeType) {
         "Unknown",
         "IntVariable", "FloatVariable",
         "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp",
+        "FragCoord",
         "Output",
     };
 
@@ -81,6 +83,7 @@ public:
     // interface StackerBox ---------------------------------
 
     virtual const char* getType() const { return "CppStackerBoxConstant"; }
+    virtual void imGui() override;
     virtual bool isVariable() const { return true; }
     virtual bool generateCode(GenerateCodeContext& context);
     virtual bool load(const rapidjson::Document::ValueType& doc);
