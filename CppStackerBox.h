@@ -74,7 +74,7 @@ private:
 
 // -------------------------------------------------------------------
 
-class CppStackerBoxFloat : public CppStackerBox {
+class CppStackerBoxConstant : public CppStackerBox {
 public:
     float value = 0;
     float minSlider = 0.0f;
@@ -82,7 +82,7 @@ public:
 
     // interface StackerBox ---------------------------------
 
-    virtual const char* getType() const { return "CppStackerBoxFloat"; }
+    virtual const char* getType() const { return "CppStackerBoxConstant"; }
     virtual bool isVariable() const { return true; }
     virtual bool generateCode(GenerateCodeContext& context);
     virtual bool load(const rapidjson::Document::ValueType& doc);

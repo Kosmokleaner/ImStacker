@@ -61,8 +61,8 @@ StackerBox* CppAppConnection::createNode(const char* className) {
     if(strcmp(className, "CppStackerBox") == 0)
         return new CppStackerBox();
 
-    if (strcmp(className, "CppStackerBoxFloat") == 0)
-        return new CppStackerBoxFloat();
+    if (strcmp(className, "CppStackerBoxConstant") == 0)
+        return new CppStackerBoxConstant();
 
     return nullptr;
 }
@@ -81,7 +81,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
 
 #define ENTRY_FLOAT(inName, tooltip) \
     if(ImGui::MenuItem(#inName, nullptr)) { \
-        auto obj = new CppStackerBoxFloat(); \
+        auto obj = new CppStackerBoxConstant(); \
         obj->rect = rect; \
         stackerUI.stackerBoxes.push_back(obj); \
     } \
@@ -362,7 +362,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 }
 
 
-bool CppStackerBoxFloat::generateCode(GenerateCodeContext& context) {
+bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
     char str[256];
 
     if (context.code) {
@@ -374,7 +374,7 @@ bool CppStackerBoxFloat::generateCode(GenerateCodeContext& context) {
     return true;
 }
 
-void CppStackerBoxFloat::drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) {
+void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) {
     (void)stackerUI;
 
     ImVec2 sizeR(maxR.x - minR.x, maxR.y - minR.y);
@@ -395,7 +395,7 @@ void CppStackerBoxFloat::drawBox(const StackerUI& stackerUI, const ImVec2 minR, 
     }
 }
 
-bool CppStackerBoxFloat::load(const rapidjson::Document::ValueType& doc) {
+bool CppStackerBoxConstant::load(const rapidjson::Document::ValueType& doc) {
     // call parent
     if (!StackerBox::load(doc))
         return false;
@@ -406,7 +406,7 @@ bool CppStackerBoxFloat::load(const rapidjson::Document::ValueType& doc) {
     return true;
 }
 
-void CppStackerBoxFloat::save(rapidjson::Document& d, rapidjson::Value& objValue) const {
+void CppStackerBoxConstant::save(rapidjson::Document& d, rapidjson::Value& objValue) const {
     // call parent
     StackerBox::save(d, objValue);
 
