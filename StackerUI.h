@@ -56,8 +56,9 @@ public:
     virtual const char* getType() const = 0;
     //
     virtual bool isVariable() const = 0;
-    // imGui properties 
-    virtual void imGui() {}
+    // imGui properties
+    // @return something changed, set dirty / recompile
+    virtual bool imGui() { return false; }
     // @return success
     virtual bool generateCode(GenerateCodeContext& context) = 0;
     //
@@ -110,6 +111,9 @@ public:
     bool scrollingActive = false;
     bool scrollingDone = false;
     bool contextMenuIsOpen = false;
+    bool autoGenerateCode = true;
+    // if true it will trigger a recompile
+    bool dirty = true;
 
     // [Id] = data
     std::vector<StackerBox*> stackerBoxes;

@@ -445,6 +445,7 @@ void StackerUI::draw() {
                 ref.rect.x += deltaX;
                 ref.rect.y += deltaY;
             }
+            dirty = true;
             mouseDelta.x -= deltaX * scale;
             mouseDelta.y -= deltaY * scale;
         }
@@ -455,19 +456,23 @@ void StackerUI::draw() {
                 ref.rect.y += deltaY;
                 ref.rect.height -= deltaY;
                 mouseDelta.y -= deltaY * scale;
+                dirty = true;
             }
             if ((resizeHandleMask & 2) && ref.rect.width > -deltaX) {
                 ref.rect.width += deltaX;
                 mouseDelta.x -= deltaX * scale;
+                dirty = true;
             }
             if ((resizeHandleMask & 4) && ref.rect.height > -deltaY) {
                 ref.rect.height += deltaY;
                 mouseDelta.y -= deltaY * scale;
+                dirty = true;
             }
             if ((resizeHandleMask & 8) && ref.rect.width > deltaX) {
                 ref.rect.x += deltaX;
                 ref.rect.width -= deltaX;
                 mouseDelta.x -= deltaX * scale;
+                dirty = true;
             }
         }
     }
@@ -495,6 +500,7 @@ void StackerUI::clearSelection() {
 void StackerUI::clipboardCut() {
     clipboardCopy();
     deleteSelection();
+    dirty = true;
 }
 
 void StackerUI::clipboardCopy() {
@@ -514,6 +520,7 @@ void StackerUI::clipboardPaste() {
     temp[temp.size() - 1] = 0;
     // no error handling, a lot of clipboard content will not work
     loadFromBuffer(temp);
+    dirty = true;
 }
 
 void StackerUI::deleteSelection() {
@@ -524,6 +531,7 @@ void StackerUI::deleteSelection() {
         stackerBoxes.erase(stackerBoxes.begin() + *it);
     }
     selectedObjects.clear();
+    dirty = true;
 }
 
 
@@ -751,11 +759,11 @@ void StackerUI::buildOrder() {
 
 
 void StackerUI::generateCode(const bool fullMode) {
-
     GenerateCodeContext context;
     context.params.reserve(1024);
 
     if (fullMode) {
+        dirty = false;
         appConnection->startCompile();
         std::string* code = appConnection->code();
         assert(code);
@@ -843,6 +851,7 @@ void StackerUI::generatedCodeUI() {
     ImGui::SameLine();
     if (ImGui::Button("  Load  ")) {
         load(fileName);
+        dirty = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("  Save  ")) {
@@ -852,6 +861,13 @@ void StackerUI::generatedCodeUI() {
     if (ImGui::Button("  Generate  ")) {
         generateCode(true);
     }
+    ImGui::SameLine();
+    ImGui::Checkbox("Auto", &autoGenerateCode);
+
+    if(autoGenerateCode && dirty && !ImGui::IsAnyMouseDown()) {
+      generateCode(true);
+    }
+
     std::string* code = appConnection->code();
     assert(code);
 
@@ -881,7 +897,9 @@ void StackerUI::propertiesUI() {
             ImGui::Separator();
 
         ImGui::PushID(index);
-        ref.imGui();
+        if(ref.imGui()) {
+          dirty = true;
+        }
         ImGui::PopID();
     }
     ImGui::End();

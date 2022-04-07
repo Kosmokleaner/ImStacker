@@ -59,7 +59,7 @@ public:
     // interface StackerBox ---------------------------------
 
     virtual const char* getType() const override { return "CppStackerBox"; }
-    virtual void imGui() override;
+    virtual bool imGui() override;
     virtual bool isVariable() const override { return false; }
     virtual bool generateCode(GenerateCodeContext& context) override;
     virtual bool load(const rapidjson::Document::ValueType& doc) override;
@@ -83,7 +83,7 @@ public:
     // interface StackerBox ---------------------------------
 
     virtual const char* getType() const { return "CppStackerBoxConstant"; }
-    virtual void imGui() override;
+    virtual bool imGui() override;
     virtual bool isVariable() const { return true; }
     virtual bool generateCode(GenerateCodeContext& context);
     virtual bool load(const rapidjson::Document::ValueType& doc);

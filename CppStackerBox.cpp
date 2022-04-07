@@ -142,11 +142,12 @@ const char* CppStackerBox::getTypeName(DataType dataType) {
     return "";
 }
 
-void CppStackerBox::imGui() {
+bool CppStackerBox::imGui() {
     validate();
     ImGui::TextUnformatted(getTypeName(dataType));
     imguiInputText("name", name, 0);
     validate();
+    return false;
 }
 
 void CppStackerBox::validate() const {
@@ -468,17 +469,25 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
     }
 }
 
-void CppStackerBoxConstant::imGui() {
-  CppStackerBox::imGui();
+bool CppStackerBoxConstant::imGui() {
+  bool ret = false;
+
+  if(CppStackerBox::imGui())
+    ret = true;
 
   if (dataType == EDT_Float) {
-    ImGui::SliderFloat("Value", &value.x, minSlider, maxSlider);
+    if(ImGui::SliderFloat("Value", &value.x, minSlider, maxSlider)) 
+      ret = true;
+
     ImGui::InputFloat("minValue", &minSlider);
     ImGui::InputFloat("maxValue", &maxSlider);
   }
   else {
-    ImGui::ColorEdit4("Value", &value.x, 0);
+    if(ImGui::ColorEdit4("Value", &value.x, 0))
+      ret = true;
   }
+
+  return ret;
 }
 
 bool CppStackerBoxConstant::load(const rapidjson::Document::ValueType& doc) {
