@@ -437,7 +437,8 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
         float border = 2;
 
         // centerx, top
-        if(maxR.y - minR.y > stackerUI.scale) {
+// if there is enough space        if(maxR.y - minR.y > stackerUI.scale) 
+        {
           ImVec2 s = ImGui::CalcTextSize(name.c_str());
           ImGui::SetCursorScreenPos(ImVec2(minR.x + (sizeR.x - s.x) / 2, minR.y + border));
           ImGui::TextUnformatted(name.c_str());

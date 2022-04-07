@@ -22,12 +22,14 @@ const char* fragment_shader_text0 =
 "#version 330 core\n"
 "out vec4 FragColor; \n"
 "\n"
-"in vec4 vertexColor; // red\n"
+"in vec4 vertexColor; // from vertex shader\n"
 "in vec4 gl_FragCoord; // (pixel.x+0.5, pixel.y+0.5, z, w)\n"
 "\n"
 "void main()\n"
 "{\n"
-"   FragColor = vertexColor;\n";
+"   uvec2 checker2 = uvec2(gl_FragCoord.xy / 16.0);\n"
+"   uint checker1 = (checker2.x & 1u) ^ (checker2.y & 1u);\n"
+"   FragColor = vec4(1.0, 1.0f, 1.0, 1.0) * mix(0.45f, 0.55f, checker1);\n";
 
 const char* fragment_shader_text1 =
 "}\n"
