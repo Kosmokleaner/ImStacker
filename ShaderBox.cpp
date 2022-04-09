@@ -22,6 +22,7 @@ const char* fragment_shader_text0 =
 "#version 330 core\n"
 "out vec4 FragColor; \n"
 "\n"
+"uniform mat4 uniform0;\n"
 "in vec4 vertexColor; // from vertex shader\n"
 "in vec4 gl_FragCoord; // (pixel.x+0.5, pixel.y+0.5, z, w)\n"
 "\n"
@@ -35,10 +36,12 @@ const char* fragment_shader_text1 =
 "}\n"
 "\n";
 
-static GLuint vertex_shader = 0;
-static GLuint g_program = 0;
-static GLuint g_vbo = 0;
-static GLuint g_idx = 0;
+static GLuint vertex_shader = -1;
+static GLuint g_program = -1;
+static GLuint g_vbo = -1;
+static GLuint g_idx = -1;
+// 0 is a valid uniform index, -1 can mean it was compieled out
+static GLuint uniform0 = -1;
 
 // If you get an error please report on GitHub. You may try different GL context version or GLSL version.
 // @param whatToCheck GL_LINK_STATUS for program or GL_COMPILE_STATUS for shaders
@@ -72,10 +75,15 @@ void recompileShaders(const char* inCode, std::string& warningsAndErrors) {
     glShaderSource(fragment_shader, 1, &ptr, NULL);
     glCompileShader(fragment_shader);
 
+
     g_program = glCreateProgram();
     glAttachShader(g_program, vertex_shader);
     glAttachShader(g_program, fragment_shader);
     glLinkProgram(g_program);
+
+    uniform0 = glGetUniformLocation(g_program, "uniform0");
+    assert(uniform0 >= 0);
+
     checkProgram(g_program, GL_LINK_STATUS, "program", warningsAndErrors);
 }
 
@@ -148,6 +156,15 @@ void drawDemo() {
         (void*)0 // byte offset in buffer
         );
     glEnableVertexAttribArray(0);
+
+    float mat[16] = { 0 };
+    // [0] = random 0..1
+
+    for(int i = 0; i < 16; ++i)
+      mat[i] = rand() / (float)RAND_MAX;
+
+    glUniformMatrix4fv(uniform0, 1, GL_FALSE, mat);
+
 //    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
     glUseProgram(0);
