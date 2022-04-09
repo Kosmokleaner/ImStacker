@@ -159,9 +159,7 @@ void drawDemo() {
 
     float mat[16] = { 0 };
     // [0] = random 0..1
-
-    for(int i = 0; i < 16; ++i)
-      mat[i] = rand() / (float)RAND_MAX;
+    mat[0] = rand() / (float)RAND_MAX;
 
     glUniformMatrix4fv(uniform0, 1, GL_FALSE, mat);
 

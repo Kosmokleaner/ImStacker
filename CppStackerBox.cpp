@@ -115,6 +115,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     ENTRY(Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
     ENTRY(Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
     ENTRY(FragCoord, "see OpenGL gl_FragCoord");
+    ENTRY(Rand, "float random in 0..1 range");
     ENTRY(Output, "output vec4 as postprocess");
 
 #undef ENTRY
@@ -218,6 +219,17 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       return true;
     }
 
+    if (context.params.size() == 0 && nodeType == NT_Rand) {
+      if (context.code) {
+        dataType = EDT_Float;
+        sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][0];\n",
+          getTypeName(dataType),
+          vIndex);
+        *context.code += str;
+      }
+      validate();
+      return true;
+    }
     dataType = EDT_Unknown;  
 
     if (!context.params.empty()) {
