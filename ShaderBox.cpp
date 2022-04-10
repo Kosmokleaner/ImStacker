@@ -46,127 +46,127 @@ static GLuint uniform0 = -1;
 // If you get an error please report on GitHub. You may try different GL context version or GLSL version.
 // @param whatToCheck GL_LINK_STATUS for program or GL_COMPILE_STATUS for shaders
 static bool checkProgram(GLuint handle, GLuint whatToCheck, const char* desc, std::string& warningsAndErrors) {
-    warningsAndErrors.clear();
+  warningsAndErrors.clear();
 
-    GLint status = 0, log_length = 0;
-    glGetProgramiv(handle, whatToCheck, &status);
-    glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
-    if ((GLboolean)status == GL_FALSE) {
-        OutputDebugStringA("ERROR: ");
-        OutputDebugStringA(desc);
-        OutputDebugStringA("\n");
-    }
-    if (log_length > 1)
-    {
-        ImVector<char> buf;
-        buf.resize((int)(log_length + 1));
-        glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
-        OutputDebugStringA(buf.begin());
-        warningsAndErrors = buf.begin();
-    }
-    return (GLboolean)status == GL_TRUE;
+  GLint status = 0, log_length = 0;
+  glGetProgramiv(handle, whatToCheck, &status);
+  glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
+  if ((GLboolean)status == GL_FALSE) {
+    OutputDebugStringA("ERROR: ");
+    OutputDebugStringA(desc);
+    OutputDebugStringA("\n");
+  }
+  if (log_length > 1)
+  {
+    ImVector<char> buf;
+    buf.resize((int)(log_length + 1));
+    glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+    OutputDebugStringA(buf.begin());
+    warningsAndErrors = buf.begin();
+  }
+  return (GLboolean)status == GL_TRUE;
 }
 
 void recompileShaders(const char* inCode, std::string& warningsAndErrors) {
-    assert(inCode);
+  assert(inCode);
 
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* ptr = inCode;
-    glShaderSource(fragment_shader, 1, &ptr, NULL);
-    glCompileShader(fragment_shader);
+  GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+  const char* ptr = inCode;
+  glShaderSource(fragment_shader, 1, &ptr, NULL);
+  glCompileShader(fragment_shader);
 
 
-    g_program = glCreateProgram();
-    glAttachShader(g_program, vertex_shader);
-    glAttachShader(g_program, fragment_shader);
-    glLinkProgram(g_program);
+  g_program = glCreateProgram();
+  glAttachShader(g_program, vertex_shader);
+  glAttachShader(g_program, fragment_shader);
+  glLinkProgram(g_program);
 
-    uniform0 = glGetUniformLocation(g_program, "uniform0");
-    assert(uniform0 >= 0);
+  uniform0 = glGetUniformLocation(g_program, "uniform0");
+  assert(uniform0 >= 0);
 
-    checkProgram(g_program, GL_LINK_STATUS, "program", warningsAndErrors);
+  checkProgram(g_program, GL_LINK_STATUS, "program", warningsAndErrors);
 }
 
 static void init() {
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-    glCompileShader(vertex_shader);
+  vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
+  glCompileShader(vertex_shader);
 
-    std::string warningsAndErrors;
-    std::string shaderCode;
-    shaderCode += fragment_shader_text0;
-    shaderCode += fragment_shader_text1;
-    recompileShaders(shaderCode.c_str(), warningsAndErrors);
+  std::string warningsAndErrors;
+  std::string shaderCode;
+  shaderCode += fragment_shader_text0;
+  shaderCode += fragment_shader_text1;
+  recompileShaders(shaderCode.c_str(), warningsAndErrors);
 
-    const float r = 1.0f;
+  const float r = 1.0f;
 
-    // x, y, z
-    GLfloat vertices[] = {
-      -r,  r,  0.5f, // 0, left top
-       r,  r,  0.5f, // 1, right, top
-      -r, -r,  0.5f, // 2, left bottom
-       r, -r,  0.5f, // 3, right bottom
-    };
+  // x, y, z
+  GLfloat vertices[] = {
+    -r,  r,  0.5f, // 0, left top
+     r,  r,  0.5f, // 1, right, top
+    -r, -r,  0.5f, // 2, left bottom
+     r, -r,  0.5f, // 3, right bottom
+  };
 
-    glGenBuffers(1, &g_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glGenBuffers(1, &g_vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    unsigned int indices[] = {
-        0, 1, 2,
-        1, 3, 2
-    };
+  unsigned int indices[] = {
+      0, 1, 2,
+      1, 3, 2
+  };
 
-    glGenBuffers(1, &g_idx);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_idx);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  glGenBuffers(1, &g_idx);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_idx);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
 static void deinit() {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glDeleteBuffers(1, &g_idx);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glDeleteBuffers(1, &g_idx);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDeleteBuffers(1, &g_vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glDeleteBuffers(1, &g_vbo);
 }
 
 void drawDemo() {
-    static bool first = true;
+  static bool first = true;
 
-    if (first) {
-        init();
-        first = false;
-    }
+  if (first) {
+    init();
+    first = false;
+  }
 
-//    ImDrawData* draw_data = ImGui::GetDrawData();
-//    MyImGuiRenderFunction(draw_data);
+  //    ImDrawData* draw_data = ImGui::GetDrawData();
+  //    MyImGuiRenderFunction(draw_data);
 
-//    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-//    glClear(GL_COLOR_BUFFER_BIT);
-//    glViewport(0, 0, 100, 100);
-    glScissor(0, 0, 16*1024, 16 * 1024);
-    glUseProgram(g_program);
-    glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_idx);
-    glVertexAttribPointer(
-        0, // attribute pos 0
-        3, GL_FLOAT, // 3 floats
-        GL_FALSE, // sRGB ?
-        3 * sizeof(float), // vertex buffer stride in bytes
-        (void*)0 // byte offset in buffer
-        );
-    glEnableVertexAttribArray(0);
+  //    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  //    glClear(GL_COLOR_BUFFER_BIT);
+  //    glViewport(0, 0, 100, 100);
+  glScissor(0, 0, 16 * 1024, 16 * 1024);
+  glUseProgram(g_program);
+  glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_idx);
+  glVertexAttribPointer(
+    0, // attribute pos 0
+    3, GL_FLOAT, // 3 floats
+    GL_FALSE, // sRGB ?
+    3 * sizeof(float), // vertex buffer stride in bytes
+    (void*)0 // byte offset in buffer
+  );
+  glEnableVertexAttribArray(0);
 
-    float mat[16] = { 0 };
-    // [0] = random 0..1
-    mat[0] = rand() / (float)RAND_MAX;
+  float mat[16] = { 0 };
+  // [0] = random 0..1
+  mat[0] = rand() / (float)RAND_MAX;
 
-    glUniformMatrix4fv(uniform0, 1, GL_FALSE, mat);
+  glUniformMatrix4fv(uniform0, 1, GL_FALSE, mat);
 
-//    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
-    glUseProgram(0);
-//    ImGui::Begin("Hello GLSL");                          // Create a window called "Hello, world!" and append into it.
-//    ImGui::Text("Test");
-//    ImGui::End();
+  //    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+  glUseProgram(0);
+  //    ImGui::Begin("Hello GLSL");                          // Create a window called "Hello, world!" and append into it.
+  //    ImGui::Text("Test");
+  //    ImGui::End();
 }
