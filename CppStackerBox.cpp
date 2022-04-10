@@ -22,8 +22,19 @@
 
 // todo: copy,paste, delete with key binding
 
+// 
+EDataType combineTypes(EDataType a, EDataType b) {
+  assert(a > EDT_Void && a < EDT_MAX);
+  assert(b > EDT_Void && b < EDT_MAX);
+
+  if(a > b) {
+    std::swap(a, b);
+  }
+  return b;
+}
+
 // @return vIndex
-int32 CppStackerBox::castTo(GenerateCodeContext& context, const DataType dstDataType) const {
+int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDataType) const {
   if (dataType == dstDataType) {
     // no cast needed
     return vIndex;
@@ -150,9 +161,9 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   }
 }
 
-const char* getTypeName(DataType dataType) {
+const char* getTypeName(const EDataType dataType) {
   switch (dataType) {
-  case EDT_Unknown: return "unknown";
+  case EDT_Void: return "void";
   case EDT_Int: return "int";
   case EDT_Float: return "float";
   case EDT_Vec2: return "vec2";
@@ -252,25 +263,24 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     validate();
     return true;
   }
-  dataType = EDT_Unknown;
+
+
+  dataType = EDT_Void;
 
   if (!context.params.empty()) {
     dataType = ((CppStackerBox*)context.params[0])->dataType;
     validate();
 
-    // all same type?
+    // largest type of all input parameters
     for (size_t i = 1, count = context.params.size(); i < count; ++i) {
-      if (((CppStackerBox*)context.params[i])->dataType != dataType) {
-        dataType = EDT_Unknown;
-        validate();
-        return false;
-      }
+      const EDataType paramDataType = ((CppStackerBox*)context.params[i])->dataType;
+      dataType = combineTypes(dataType, paramDataType);
       validate();
     }
     validate();
   }
 
-  if (dataType == EDT_Unknown) {
+  if (dataType == EDT_Void) {
     validate();
     return false;
   }
@@ -319,6 +329,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   // a-b
   if (context.params.size() == 2 && nodeType == NT_Sub) {
     if (context.code) {
+      CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = v%d - v%d; // %s\n",
         getTypeName(dataType),
         vIndex,
@@ -381,6 +392,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   // a/b
   if (context.params.size() == 2 && nodeType == NT_Div) {
     if (context.code) {
+      CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
         getTypeName(dataType),
         vIndex,
@@ -410,7 +422,6 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
   // Cos
   if (context.params.size() == 1 && nodeType == NT_Cos) {
-
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
       sprintf_s(str, sizeof(str), "%s v%d = cos(v%d); // %s\n",

@@ -4,12 +4,17 @@
 
 // index is serialized
 // update CppStackerBox::getType() if you add a new entry
-enum DataType {
-  EDT_Unknown,
+enum EDataType {
+  EDT_Void,
+  // 32bit int
   EDT_Int,
+  // 32bit float
   EDT_Float,
+  // two floats x,y
   EDT_Vec2,
+  // three floats x,y,z
   EDT_Vec3,
+  // four floats, x,y,z,w
   EDT_Vec4,
   // --------------
   EDT_MAX,
@@ -54,11 +59,11 @@ public:
   // for user/debugging, not needed to function
   std::string name;
   //
-  DataType dataType = EDT_Float;
+  EDataType dataType = EDT_Float;
   //
   ENodeType nodeType = NT_Unknown;
 
-  int32 castTo(GenerateCodeContext& context, const DataType dstDataType) const;
+  int32 castTo(GenerateCodeContext& context, const EDataType dstDataType) const;
 
   // interface StackerBox ---------------------------------
 
@@ -75,7 +80,7 @@ protected:
 };
 
 // @return name used in generated code e.g. "vec4"
-const char* getTypeName(DataType dataType);
+const char* getTypeName(const EDataType dataType);
 
 // -------------------------------------------------------------------
 
