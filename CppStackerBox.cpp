@@ -248,18 +248,6 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         validate();
     }
 
-    if (context.params.size() == 0 && nodeType == NT_FragCoord) {
-      if (context.code) {
-        assert(dataType == EDT_Vec4);
-        sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord;",
-          getTypeName(dataType),
-          vIndex);
-        *context.code += str;
-      }
-      validate();
-      return true;
-    }
-
     if (dataType == EDT_Unknown) {
         validate();
         return false;
