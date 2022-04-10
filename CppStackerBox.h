@@ -58,6 +58,8 @@ public:
     //
     ENodeType nodeType = NT_Unknown;
 
+    int32 castTo(GenerateCodeContext& context, const DataType dstDataType) const;
+
     // interface StackerBox ---------------------------------
 
     virtual const char* getType() const override { return "CppStackerBox"; }
@@ -70,9 +72,10 @@ public:
     virtual void validate() const override;
 
 protected:
-  // @return name used in generated code e.g. "vec4"
-  static const char* getTypeName(DataType dataType);
 };
+
+// @return name used in generated code e.g. "vec4"
+const char* getTypeName(DataType dataType);
 
 // -------------------------------------------------------------------
 

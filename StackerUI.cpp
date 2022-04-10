@@ -761,14 +761,13 @@ void StackerUI::buildOrder() {
 void StackerUI::generateCode(const bool fullMode) {
     GenerateCodeContext context;
     context.params.reserve(1024);
+    context.nextFreeVIndex = (int32)stackerBoxes.size();
 
     if (fullMode) {
         dirty = false;
         appConnection->startCompile();
-        std::string* code = appConnection->code();
-        assert(code);
-
-        context.code = code;
+        context.code = appConnection->code();
+        assert(context.code);
     }
 
     for (auto it = order.rbegin(), end = order.rend(); it != end; ++it) {

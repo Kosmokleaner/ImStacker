@@ -12,17 +12,19 @@ class StackerBox;
 class StackerUI;
 
 struct StackerBoxRect {
-    int32 x = 0;
-    int32 y = 0;
-    int32 width = 0;
-    int32 height = 0;
+  int32 x = 0;
+  int32 y = 0;
+  int32 width = 0;
+  int32 height = 0;
 };
 
 struct GenerateCodeContext {
-    // 0 if not in fullMode
-    std::string* code = nullptr;
-    //
-    std::vector<StackerBox*> params;
+  // 0 if not in fullMode
+  std::string* code = nullptr;
+  //
+  int32 nextFreeVIndex = 0;
+  //
+  std::vector<StackerBox*> params;
 };
 
 // base class for all elements in StackerUI
