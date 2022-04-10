@@ -248,6 +248,12 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
   ImGui::PopStyleColor();
 }
 
+void StackerUI::addFromUI(StackerBox& in) {
+  const int32 id = (int32)stackerBoxes.size();
+  stackerBoxes.push_back(&in);
+  clearSelection();
+  addToSelection(id);
+}
 
 void StackerUI::setAppConnection(IAppConnection* inAppConnection) {
   appConnection = inAppConnection ? inAppConnection : &nullAppConnection;

@@ -144,6 +144,9 @@ public:
 
     // @param appConnection may be 0, pointer is stored, not released
     void setAppConnection(IAppConnection* inAppConnection);
+
+    // adds to stackerBoxes, selects / shows properties
+    void addFromUI(StackerBox& in);
     //
     void draw();
     // @param fileName must not be 0

@@ -113,13 +113,14 @@ void CppAppConnection::endCompile() {
 
 void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {
 
-#define ENTRY(inName, tooltip) \
+// @param className e.g. CppStackerBox
+#define ENTRY(className, inName, tooltip) \
     if(ImGui::MenuItem(#inName, nullptr)) { \
-        auto obj = new CppStackerBox(); \
+        auto obj = new className(); \
         obj->nodeType = NT_##inName; \
         obj->rect = rect; \
         obj->name = "Unnamed"; \
-        stackerUI.stackerBoxes.push_back(obj); \
+        stackerUI.addFromUI(*obj); \
     } \
     imguiToolTip(tooltip);
 
@@ -130,7 +131,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
         obj->dataType = inType;\
         obj->name = #inName; \
         obj->rect = rect; \
-        stackerUI.stackerBoxes.push_back(obj); \
+        stackerUI.addFromUI(*obj); \
     } \
     imguiToolTip(tooltip);
 
@@ -138,18 +139,19 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   ENTRY_CONSTANT(FloatConstant, EDT_Float, "Floating point constant (with fractional part)");
   ENTRY_CONSTANT(Vec4Constant, EDT_Vec4, "Vec4 constant");
   ImGui::Separator();
-  ENTRY(Add, "Sum up multiple inputs of same type");
-  ENTRY(Sub, "Subtract two numbers or negate one number");
-  ENTRY(Mul, "Multiple multiple numbers");
-  ENTRY(Div, "Divide two numbers, 1/x a single number");
-  ENTRY(Sin, "Sin() in radiants");
-  ENTRY(Cos, "Cos() in radiants");
-  ENTRY(Frac, "like HLSL frac() = x-floor(x)");
-  ENTRY(Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
-  ENTRY(Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
-  ENTRY(FragCoord, "see OpenGL gl_FragCoord");
-  ENTRY(Rand, "float random in 0..1 range");
-  ENTRY(Output, "output vec4 as postprocess");
+  ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
+  ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
+  ENTRY(CppStackerBox, Mul, "Multiple multiple numbers");
+  ENTRY(CppStackerBox, Div, "Divide two numbers, 1/x a single number");
+  ENTRY(CppStackerBox, Sin, "Sin() in radiants");
+  ENTRY(CppStackerBox, Cos, "Cos() in radiants");
+  ENTRY(CppStackerBox, Frac, "like HLSL frac() = x-floor(x)");
+  ENTRY(CppStackerBox, Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
+  ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
+  ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
+  ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
+  ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
+  ENTRY(CppStackerBox, Output, "output vec4 as postprocess");
 
 #undef ENTRY
 
@@ -178,6 +180,8 @@ const char* getTypeName(const EDataType dataType) {
 
 bool CppStackerBox::imGui() {
   validate();
+  ImGui::TextUnformatted("DataType: ");
+  ImGui::SameLine();
   ImGui::TextUnformatted(getTypeName(dataType));
   imguiInputText("name", name, 0);
   validate();
@@ -294,7 +298,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d",
         getTypeName(dataType),
         vIndex,
-        context.params[0]->vIndex);
+        param0.vIndex);
       validate();
       *context.code += str;
 
@@ -318,7 +322,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d; // %s\n",
         getTypeName(dataType),
         vIndex,
-        context.params[0]->vIndex,
+        param0.vIndex,
         name.c_str());
       *context.code += str;
     }
@@ -333,7 +337,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d - v%d; // %s\n",
         getTypeName(dataType),
         vIndex,
-        context.params[0]->vIndex,
+        param0.vIndex,
         context.params[1]->vIndex,
         name.c_str());
       *context.code += str;
@@ -359,7 +363,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d",
         getTypeName(dataType),
         vIndex,
-        context.params[0]->vIndex);
+        param0.vIndex);
       *context.code += str;
 
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
@@ -381,8 +385,27 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = 1.0f / v%d; // %s\n",
         getTypeName(dataType),
         vIndex,
-        context.params[0]->vIndex,
+        param0.vIndex,
         name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
+  if (context.params.size() == 1 && nodeType == NT_Swizzle) {
+    if (context.code) {
+      CppStackerBoxSwizzle& self = (CppStackerBoxSwizzle&)*this;
+      dataType = self.computeOutputDataType(param0.dataType);
+
+      if(dataType == EDT_Void)
+        return false;
+      
+      sprintf_s(str, sizeof(str), "%s v%d = (v%d).%s;\n",
+        getTypeName(dataType),
+        vIndex,
+        param0.vIndex,
+        self.xyzw);
       *context.code += str;
     }
     validate();
@@ -396,7 +419,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
         getTypeName(dataType),
         vIndex,
-        context.params[0]->vIndex,
+        param0.vIndex,
         context.params[1]->vIndex,
         name.c_str());
       *context.code += str;
@@ -554,3 +577,88 @@ void CppStackerBoxConstant::save(rapidjson::Document& d, rapidjson::Value& objVa
   objValue.AddMember("minSlider", minSlider, d.GetAllocator());
   objValue.AddMember("maxSlider", maxSlider, d.GetAllocator());
 }
+
+bool CppStackerBoxSwizzle::imGui() {
+  bool ret = false;
+
+  if (CppStackerBox::imGui())
+    ret = true;
+
+  ImGui::InputText("XYZW", xyzw, 5, 0);
+
+  return ret;
+}
+
+bool CppStackerBoxSwizzle::load(const rapidjson::Document::ValueType& doc) {
+  // call parent
+  if (!StackerBox::load(doc))
+    return false;
+
+  const char* str = doc["xyzw"].GetString();
+  if(strlen(str) > 4) {
+    return false;
+  }
+
+  strcpy_s(xyzw, str);
+  return true;
+}
+
+void CppStackerBoxSwizzle::save(rapidjson::Document& d, rapidjson::Value& objValue) const {
+  // call parent
+  StackerBox::save(d, objValue);
+
+  objValue.AddMember("xyzw", xyzw, d.GetAllocator());
+}
+
+EDataType CppStackerBoxSwizzle::computeOutputDataType(const EDataType inputDataType) const {
+  assert(inputDataType < EDT_MAX);
+
+  const char* p = xyzw;
+
+  // 0:none, 1:x, 2:xy, 3:zyw, 4:xyzw
+  int32 inputComponentCount = 0;
+
+  if(inputDataType == EDT_Int || inputDataType == EDT_Float)
+    inputComponentCount = 1;
+  else if (inputDataType == EDT_Vec2)
+    inputComponentCount = 2;
+  else if (inputDataType == EDT_Vec3)
+    inputComponentCount = 3;
+  else if (inputDataType == EDT_Vec4)
+    inputComponentCount = 4;
+
+  while(char c = *p++){
+    // outside of range by default
+    int32 componentIndex = 4;
+
+    c = tolower(c);
+
+    if(c == 'x' || c == 'r')
+      componentIndex = 0;
+    else if (c == 'y' || c == 'g')
+      componentIndex = 1;
+    else if (c == 'z' || c == 'b')
+      componentIndex = 2;
+    else if (c == 'w' || c == 'a')
+      componentIndex = 3;
+
+    if(componentIndex >= inputComponentCount)
+      return EDT_Void;
+  }
+
+  EDataType ret = EDT_Void;
+
+  if (inputComponentCount == 1)
+    ret = inputDataType;
+  if(inputComponentCount == 2)
+    ret = EDT_Vec2;
+  else if (inputComponentCount == 3)
+    ret = EDT_Vec3;
+  else if (inputComponentCount == 4)
+    ret = EDT_Vec4;
+  else assert(0);
+
+  return ret;
+}
+
+

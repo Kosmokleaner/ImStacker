@@ -29,6 +29,7 @@ enum ENodeType {
   NT_Unknown,
   NT_IntVariable, NT_FloatVariable,
   NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp,
+  NT_Swizzle, // like UE4 ComponentMask and Append in one
   NT_Rand,
   NT_FragCoord,
   NT_Output,
@@ -42,6 +43,7 @@ inline const char* enumToCStr(const ENodeType nodeType) {
       "Unknown",
       "IntVariable", "FloatVariable",
       "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp",
+      "Swizzle",
       "Rand",
       "FragCoord",
       "Output",
@@ -75,8 +77,6 @@ public:
   virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const override;
   virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) override;
   virtual void validate() const override;
-
-protected:
 };
 
 // @return name used in generated code e.g. "vec4"
@@ -114,4 +114,22 @@ public:
   virtual void startCompile();
   virtual void endCompile();
   virtual std::string* code() { return &generatedCode; }
+};
+
+// -------------------------------------------------------------------
+
+class CppStackerBoxSwizzle : public CppStackerBox {
+public:
+  // 0 terminated, to be valid it must only use xyzw and the input must have those
+  char xyzw[5] = { 'x', 'y', 0, 0, 0 };
+
+  // @return EDT_Void means the swizzle failed
+  EDataType computeOutputDataType(const EDataType inputDataType) const;
+
+  // interface StackerBox ---------------------------------
+
+  virtual const char* getType() const override { return "CppStackerBoxSwizzle"; }
+  virtual bool imGui() override;
+  virtual bool load(const rapidjson::Document::ValueType& doc) override;
+  virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const override;
 };
