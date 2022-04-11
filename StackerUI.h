@@ -111,7 +111,8 @@ public:
     //
     bool dragActive = false;
     bool scrollingActive = false;
-    bool scrollingDone = false;
+    // in pixels, sum of all movements in manhattan distance
+    float scrollingAmount = 0.0f;
     bool contextMenuIsOpen = false;
     bool autoGenerateCode = true;
     // if true it will trigger a recompile

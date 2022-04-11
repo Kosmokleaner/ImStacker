@@ -271,19 +271,21 @@ void StackerUI::draw() {
   ImGui::BeginChild("scrolling_region", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
 
   // Scrolling
-  if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Right, 0.0f)) {
-    scrollingActive = true;
-    scrollingX = scrollingX + (int32)io.MouseDelta.x;
-    scrollingY = scrollingY + (int32)io.MouseDelta.y;
+  if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive()) {
+    if(ImGui::IsMouseDragging(ImGuiMouseButton_Right, 0.0f)) {
+      scrollingActive = true;
+      scrollingX = scrollingX + (int32)io.MouseDelta.x;
+      scrollingY = scrollingY + (int32)io.MouseDelta.y;
 
-    if (io.MouseDelta.x != 0.0f || io.MouseDelta.y != 0.0f)
-      scrollingDone = true;
-  }
-  else {
-    if (!scrollingDone && scrollingActive)
-      ImGui::OpenPopup("context menu", 1);
-    scrollingActive = false;
-    scrollingDone = false;
+      scrollingAmount += abs(io.MouseDelta.x) + abs(io.MouseDelta.y);
+    }
+    else {
+      // open context menu even if there was a small accidential RMB drag
+      if (scrollingAmount < 10.0f && scrollingActive)
+        ImGui::OpenPopup("context menu", 1);
+      scrollingActive = false;
+      scrollingAmount = 0.0f;
+    }
   }
 
   const ImVec2 offset = ImVec2(ImGui::GetCursorScreenPos().x + scrollingX, ImGui::GetCursorScreenPos().y + scrollingY);
