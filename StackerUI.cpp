@@ -200,10 +200,10 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
       for (uint32 id = 0, count = (uint32)stackerBoxes.size(); id < count; ++id) {
         auto& ref = *stackerBoxes[id];
 
-        if (ref.rect.x + ref.rect.width >= mousePosX
-          && ref.rect.y + ref.rect.height >= mousePosY
-          && ref.rect.x <= mousePosX
-          && ref.rect.y <= mousePosY) {
+        if (ref.rect.x <= mousePosX
+          && ref.rect.y <= mousePosY
+          && ref.rect.x + ref.rect.width > mousePosX
+          && ref.rect.y + ref.rect.height > mousePosY) {
           rightClickOnId = id;
         }
       }
