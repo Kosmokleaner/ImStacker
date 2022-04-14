@@ -43,11 +43,12 @@ int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDat
   if (context.code) {
     const char* dstDataTypeStr = getTypeName(dstDataType);
     char str[256];
-    sprintf_s(str, sizeof(str), "%s v%d = %s(v%d);\n",
+    sprintf_s(str, sizeof(str), "%s v%d = %s(v%d);\n%s",
       dstDataTypeStr,
       context.nextFreeVIndex,
       dstDataTypeStr,
-      vIndex);
+      vIndex,
+      context.indentationStr);
     *context.code += str;
   }
 
