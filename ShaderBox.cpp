@@ -30,7 +30,7 @@ const char* fragment_shader_text0 =
 "{\n"
 "   uvec2 checker2 = uvec2(gl_FragCoord.xy / 16.0);\n"
 "   uint checker1 = (checker2.x & 1u) ^ (checker2.y & 1u);\n"
-"   FragColor = vec4(1.0, 1.0f, 1.0, 1.0) * mix(0.45f, 0.55f, checker1);\n";
+"   FragColor = vec4(1.0, 1.0f, 1.0, 1.0) * mix(0.45f, 0.55f, checker1);\n\n";
 
 const char* fragment_shader_text1 =
 "}\n"

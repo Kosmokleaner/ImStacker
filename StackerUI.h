@@ -19,6 +19,7 @@ struct StackerBoxRect {
 };
 
 struct GenerateCodeContext {
+  const char* indentationStr = "  ";
   // 0 if not in fullMode
   std::string* code = nullptr;
   //
