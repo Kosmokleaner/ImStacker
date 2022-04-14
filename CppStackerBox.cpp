@@ -383,7 +383,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     dataType = EDT_Float;
     if (context.code) {
       CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
-      sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s",
+      sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
         getTypeName(dataType),
         vIndex,
         param0.vIndex,
