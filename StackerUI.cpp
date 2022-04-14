@@ -981,6 +981,11 @@ void StackerUI::buildGraph() {
         if (thereId < 0)
           continue;
 
+        const auto& there = *stackerBoxes[thereId];
+
+        if (!there.canHaveInput())
+          continue;
+
         if (parentId == -1) {
           parentId = thereId;
           stackerBoxes[thereId]->isUsedAsInput = true;

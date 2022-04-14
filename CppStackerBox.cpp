@@ -24,8 +24,6 @@
 
 // 
 EDataType combineTypes(EDataType a, EDataType b) {
-  assert(a > EDT_Void && a < EDT_MAX);
-  assert(b > EDT_Void && b < EDT_MAX);
 
   if(a > b) {
     std::swap(a, b);
@@ -120,7 +118,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
         auto obj = new className(); \
         obj->nodeType = NT_##inName; \
         obj->rect = rect; \
-        obj->name = "Unnamed"; \
+        obj->name = #inName; \
         stackerUI.addFromUI(*obj); \
     } \
     imguiToolTip(tooltip);
@@ -149,6 +147,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   ENTRY(CppStackerBox, Frac, "like HLSL frac() = x-floor(x)");
   ENTRY(CppStackerBox, Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
   ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
+  ENTRY(CppStackerBox, Dot, "like HLSL dot(a, b)");
   ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
   ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
   ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
@@ -380,6 +379,23 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
+  if (nodeType == NT_Dot && context.params.size() == 2) {
+    dataType = EDT_Float;
+    if (context.code) {
+      CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
+      sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s",
+        getTypeName(dataType),
+        vIndex,
+        param0.vIndex,
+        param1.vIndex,
+        name.c_str()
+      );
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
   // 1/b
   if (context.params.size() == 1 && nodeType == NT_Div) {
     if (context.code) {
@@ -462,7 +478,6 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   validate();
   return false;
 }
-
 
 bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
   char str[256];

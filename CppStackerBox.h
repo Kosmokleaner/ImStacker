@@ -28,7 +28,7 @@ enum EDataType {
 enum ENodeType {
   NT_Unknown,
   NT_IntVariable, NT_FloatVariable,
-  NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp,
+  NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp, NT_Dot,
   NT_Swizzle, // like UE4 ComponentMask and Append in one
   NT_Rand,
   NT_FragCoord,
@@ -42,7 +42,7 @@ inline const char* enumToCStr(const ENodeType nodeType) {
   const char* tab[] = {
       "Unknown",
       "IntVariable", "FloatVariable",
-      "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp",
+      "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp", "Dot",
       "Swizzle",
       "Rand",
       "FragCoord",
@@ -95,6 +95,7 @@ public:
   virtual const char* getType() const { return "CppStackerBoxConstant"; }
   virtual bool imGui() override;
   virtual bool isVariable() const { return true; }
+  virtual bool canHaveInput() const { return false; }
   virtual bool generateCode(GenerateCodeContext& context);
   virtual bool load(const rapidjson::Document::ValueType& doc);
   virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const;
