@@ -11,11 +11,11 @@ enum EDataType {
   // 32bit float
   EDT_Float,
   // two floats x,y
-  EDT_Vec2,
+  EDT_Float2,
   // three floats x,y,z
-  EDT_Vec3,
+  EDT_Float3,
   // four floats, x,y,z,w
-  EDT_Vec4,
+  EDT_Float4,
   // --------------
   EDT_MAX,
 };
@@ -80,17 +80,29 @@ public:
 };
 
 // @return name used in generated code e.g. "vec4"
-const char* getTypeName(const EDataType dataType);
+const char* getGLSLTypeName(const EDataType dataType);
 
 // -------------------------------------------------------------------
 
 class CppStackerBoxConstant : public CppStackerBox {
 public:
+  enum EConstantType {
+    ECT_Float,
+    ECT_Float2,
+    ECT_Float3,
+    ECT_Float4,
+    ECT_ColorRGB,
+    ECT_ColorRGBA,
+  };
+  static constexpr const char* constantTypeUI = (char*)"Float\0" "Float2\0" "Float3\0" "Float4\0" "ColorRGB\0" "ColorRGBA\0" ;
+
+  EConstantType constantType = ECT_Float;
+
   ImVec4 value = {};
   float minSlider = 0.0f;
   float maxSlider = 1.0f;
-  // todo: enum
-  bool colorUI = true;
+
+  EDataType getDataType() const;
 
   // interface StackerBox ---------------------------------
 

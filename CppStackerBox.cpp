@@ -39,7 +39,7 @@ int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDat
   }
 
   if (context.code) {
-    const char* dstDataTypeStr = getTypeName(dstDataType);
+    const char* dstDataTypeStr = getGLSLTypeName(dstDataType);
     char str[256];
     sprintf_s(str, sizeof(str), "%s v%d = %s(v%d);\n%s",
       dstDataTypeStr,
@@ -123,20 +123,25 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     } \
     imguiToolTip(tooltip);
 
-  // @param inType e.g. EDT_Float
-#define ENTRY_CONSTANT(inName, inType, tooltip) \
+  // @param inConstantType e.g. ECT_Float3
+#define ENTRY_CONSTANT(inName, inConstantType, tooltip) \
     if(ImGui::MenuItem(#inName, nullptr)) { \
         auto obj = new CppStackerBoxConstant(); \
-        obj->dataType = inType;\
-        obj->name = #inName; \
+        obj->constantType = inConstantType;\
+        obj->name = "Constant"; \
         obj->rect = rect; \
+        obj->dataType = obj->getDataType(); \
         stackerUI.addFromUI(*obj); \
     } \
     imguiToolTip(tooltip);
 
 //    ENTRY(IntVariable, "Integer variable (no fractional part)");
-  ENTRY_CONSTANT(FloatConstant, EDT_Float, "Floating point constant (with fractional part)");
-  ENTRY_CONSTANT(Vec4Constant, EDT_Vec4, "Vec4 constant");
+  ENTRY_CONSTANT(Constant, CppStackerBoxConstant::ECT_Float, "Floating point constant (with fractional part)");
+//  ENTRY_CONSTANT(Vec2 Constant, CppStackerBoxConstant::ECT_Float2, "Float2 constant");
+//  ENTRY_CONSTANT(Vec3 Constant, CppStackerBoxConstant::ECT_Float3, "Float3 constant");
+//  ENTRY_CONSTANT(Vec4 Constant, CppStackerBoxConstant::ECT_Float4, "Float4 constant");
+//  ENTRY_CONSTANT(RGB Constant, CppStackerBoxConstant::ECT_ColorRGB, "Color RGB constant");
+//  ENTRY_CONSTANT(RGBA Constant, CppStackerBoxConstant::ECT_RGBA, "Color RGBA constant");
   ImGui::Separator();
   ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
   ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
@@ -163,14 +168,14 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   }
 }
 
-const char* getTypeName(const EDataType dataType) {
+const char* getGLSLTypeName(const EDataType dataType) {
   switch (dataType) {
   case EDT_Void: return "void";
   case EDT_Int: return "int";
   case EDT_Float: return "float";
-  case EDT_Vec2: return "vec2";
-  case EDT_Vec3: return "vec3";
-  case EDT_Vec4: return "vec4";
+  case EDT_Float2: return "vec2";
+  case EDT_Float3: return "vec3";
+  case EDT_Float4: return "vec4";
   default:
     assert(0);
   }
@@ -180,10 +185,12 @@ const char* getTypeName(const EDataType dataType) {
 
 bool CppStackerBox::imGui() {
   validate();
+  // todo: move to tooltip
   ImGui::TextUnformatted("DataType: ");
   ImGui::SameLine();
-  ImGui::TextUnformatted(getTypeName(dataType));
+  ImGui::TextUnformatted(getGLSLTypeName(dataType));
   imguiInputText("name", name, 0);
+  ImGui::Separator();
   validate();
   return false;
 }
@@ -246,10 +253,11 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
   if (context.params.size() == 0 && nodeType == NT_FragCoord) {
     if (context.code) {
-      dataType = EDT_Vec4;
-      sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord;\n",
-        getTypeName(dataType),
-        vIndex);
+      dataType = EDT_Float4;
+      sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord; // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        name.c_str());
       *context.code += str;
     }
     validate();
@@ -259,9 +267,10 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (context.params.size() == 0 && nodeType == NT_Rand) {
     if (context.code) {
       dataType = EDT_Float;
-      sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][0];\n",
-        getTypeName(dataType),
-        vIndex);
+      sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][0]; // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        name.c_str());
       *context.code += str;
     }
     validate();
@@ -296,7 +305,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     validate();
     if (context.code) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex);
       validate();
@@ -320,7 +329,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (context.params.size() == 1 && nodeType == NT_Sub) {
     if (context.code) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d; // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
         name.c_str());
@@ -335,7 +344,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.code) {
       CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = v%d - v%d; // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
         context.params[1]->vIndex,
@@ -348,7 +357,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
   if (context.params.size() == 1 && nodeType == NT_Output) {
     if (context.code) {
-      int32 paramVIndex = param0.castTo(context, EDT_Vec4);
+      int32 paramVIndex = param0.castTo(context, EDT_Float4);
       sprintf_s(str, sizeof(str), "FragColor = v%d", paramVIndex);
       *context.code += str;
       sprintf_s(str, sizeof(str), "; // %s\n", name.c_str());
@@ -361,7 +370,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Mul) {
     if (context.code) {
       sprintf_s(str, sizeof(str), "%s v%d = v%d",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex);
       *context.code += str;
@@ -384,7 +393,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.code) {
       CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
         param1.vIndex,
@@ -400,7 +409,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (context.params.size() == 1 && nodeType == NT_Div) {
     if (context.code) {
       sprintf_s(str, sizeof(str), "%s v%d = 1.0f / v%d; // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
         name.c_str());
@@ -419,7 +428,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         return false;
       
       sprintf_s(str, sizeof(str), "%s v%d = (v%d).%s;\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,  
         self.xyzw);
@@ -434,7 +443,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.code) {
       CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
         context.params[1]->vIndex,
@@ -450,7 +459,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
       sprintf_s(str, sizeof(str), "%s v%d = sin(v%d); // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
         name.c_str());
@@ -465,7 +474,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
       sprintf_s(str, sizeof(str), "%s v%d = cos(v%d); // %s\n",
-        getTypeName(dataType),
+        getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
         name.c_str());
@@ -484,19 +493,39 @@ bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
 
   if (context.code) {
     if (dataType == EDT_Float) {
-      sprintf_s(str, sizeof(str), "%s v%d = %f;\n",
-        getTypeName(dataType),
+      sprintf_s(str, sizeof(str), "%s v%d = %f; // %s\n",
+        getGLSLTypeName(dataType),
         vIndex,
-        value.x);
+        value.x,
+        name.c_str());
+      *context.code += str;
+    }
+    else if (dataType == EDT_Float2) {
+      sprintf_s(str, sizeof(str), "%s v%d = vec2(%f, %f); // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        value.x, value.y,
+        name.c_str());
+      *context.code += str;
+    }
+    else if (dataType == EDT_Float3) {
+      sprintf_s(str, sizeof(str), "%s v%d = vec3(%f, %f, %f); // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        value.x, value.y, value.z,
+        name.c_str());
+      *context.code += str;
+    }
+    else if(dataType == EDT_Float4) {
+      sprintf_s(str, sizeof(str), "%s v%d = vec4(%f, %f, %f, %f); // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        value.x, value.y, value.z, value.w,
+        name.c_str());
       *context.code += str;
     }
     else {
-      assert(dataType == EDT_Vec4);
-      sprintf_s(str, sizeof(str), "%s v%d = vec4(%f, %f, %f, %f);\n",
-        getTypeName(dataType),
-        vIndex,
-        value.x, value.y, value.z, value.w);
-      *context.code += str;
+      assert(0);
     }
   }
   return true;
@@ -527,15 +556,7 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
 
     ImGui::SetNextItemWidth(sliderSizeX);
 
-    if (dataType == EDT_Float) {
-      char str[80];
-      sprintf_s(str, 80, "%.2f", value.x);
-      ImVec2 s = ImGui::CalcTextSize(str);
-      ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (sliderSizeX - s.x) / 2);
-      //          ImGui::SliderFloat("", &value.x, minSlider, maxSlider);
-      ImGui::TextUnformatted(str);
-    }
-    else if(colorUI) {
+    if (constantType == ECT_ColorRGB || constantType == ECT_ColorRGBA) {
       // todo: show alpha as well
       ImVec4 col3(value.x, value.y, value.z, 1.0f);
       ImGui::PushStyleColor(ImGuiCol_Button, col3);
@@ -544,7 +565,52 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
       ImGui::Button("", ImVec2(sliderSizeX, (float)stackerUI.connectorSize));
       ImGui::PopStyleColor(3);
     }
+  
+    char str[256];
+
+    if (dataType == EDT_Float) {
+      sprintf_s(str, 80, "%.2f", value.x);
+      ImVec2 s = ImGui::CalcTextSize(str);
+      ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (sliderSizeX - s.x) / 2);
+      //          ImGui::SliderFloat("", &value.x, minSlider, maxSlider);
+      ImGui::TextUnformatted(str);
+    }
+    else if (dataType == EDT_Float2) {
+      sprintf_s(str, 80, "%.2f %.2f", value.x, value.y);
+      ImVec2 s = ImGui::CalcTextSize(str);
+      ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (sliderSizeX - s.x) / 2);
+      ImGui::TextUnformatted(str);
+    }
+    else if (dataType == EDT_Float3) {
+      sprintf_s(str, 80, "%.2f %.2f %.2f", value.x, value.y, value.z);
+      ImVec2 s = ImGui::CalcTextSize(str);
+      ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (sliderSizeX - s.x) / 2);
+      ImGui::TextUnformatted(str);
+    }
+    else if (dataType == EDT_Float4) {
+      sprintf_s(str, 80, "%.2f %.2f %.2f %.2f", value.x, value.y, value.z, value.w);
+      ImVec2 s = ImGui::CalcTextSize(str);
+      ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (sliderSizeX - s.x) / 2);
+      ImGui::TextUnformatted(str);
+    }
+    else {
+      assert(0);
+    }
   }
+}
+
+EDataType CppStackerBoxConstant::getDataType() const {
+  switch(constantType) {
+    case ECT_Float: return EDT_Float;
+    case ECT_Float2: return EDT_Float2;
+    case ECT_Float3: return EDT_Float3;
+    case ECT_Float4: return EDT_Float4;
+    case ECT_ColorRGB: return EDT_Float3;
+    case ECT_ColorRGBA: return EDT_Float4;
+    default:
+      assert(0);
+  }
+  return EDT_Void;
 }
 
 bool CppStackerBoxConstant::imGui() {
@@ -553,25 +619,39 @@ bool CppStackerBoxConstant::imGui() {
   if (CppStackerBox::imGui())
     ret = true;
 
-  if (dataType == EDT_Float) {
-    if (ImGui::SliderFloat("Value", &value.x, minSlider, maxSlider))
-      ret = true;
-
-    ImGui::InputFloat("minValue", &minSlider);
-    ImGui::InputFloat("maxValue", &maxSlider);
+  if(ImGui::Combo("ConstantType", (int*)&constantType, constantTypeUI)) {
+    dataType = getDataType();
   }
-  else {
-    ImGui::Checkbox("Color", &colorUI);
-    if(colorUI) {
-      if (ImGui::ColorEdit4("Value", &value.x, 0))
-        ret = true;
-    } else {
+
+  if (!(constantType == ECT_ColorRGB || constantType == ECT_ColorRGBA)) {
       ImGui::InputFloat("minValue", &minSlider);
       ImGui::InputFloat("maxValue", &maxSlider);
+  }
 
-      if (ImGui::SliderFloat4("Value", &value.x, minSlider, maxSlider))
-        ret = true;
-    }
+  if(constantType == ECT_Float) {
+    assert(dataType == EDT_Float);
+    if (ImGui::SliderFloat("Value", &value.x, minSlider, maxSlider))
+      ret = true;
+  }
+  else if (constantType == ECT_ColorRGB) {
+    if (ImGui::ColorEdit3("Value", &value.x, 0))
+      ret = true;
+  }
+  else if (constantType == ECT_ColorRGBA) {
+    if (ImGui::ColorEdit4("Value", &value.x, 0))
+      ret = true;
+  }
+  else if (constantType == ECT_Float2) {
+    if (ImGui::SliderFloat2("Value", &value.x, minSlider, maxSlider))
+      ret = true;
+  }
+  else if (constantType == ECT_Float3) {
+    if (ImGui::SliderFloat3("Value", &value.x, minSlider, maxSlider))
+      ret = true;
+  }
+  else if (constantType == ECT_Float4) {
+    if (ImGui::SliderFloat4("Value", &value.x, minSlider, maxSlider))
+      ret = true;
   }
 
   return ret;
@@ -582,12 +662,16 @@ bool CppStackerBoxConstant::load(const rapidjson::Document::ValueType& doc) {
   if (!StackerBox::load(doc))
     return false;
 
+  // todo: error handling
+  constantType = (EConstantType)doc["constantType"].GetInt();
   value.x = doc["valueX"].GetFloat();
   value.y = doc["valueY"].GetFloat();
   value.z = doc["valueZ"].GetFloat();
   value.w = doc["valueW"].GetFloat();
   minSlider = doc["minSlider"].GetFloat();
   maxSlider = doc["maxSlider"].GetFloat();
+
+  dataType = getDataType();
   return true;
 }
 
@@ -595,6 +679,7 @@ void CppStackerBoxConstant::save(rapidjson::Document& d, rapidjson::Value& objVa
   // call parent
   StackerBox::save(d, objValue);
 
+  objValue.AddMember("constantType", constantType, d.GetAllocator());
   objValue.AddMember("valueX", value.x, d.GetAllocator());
   objValue.AddMember("valueY", value.y, d.GetAllocator());
   objValue.AddMember("valueZ", value.z, d.GetAllocator());
@@ -645,11 +730,11 @@ EDataType CppStackerBoxSwizzle::computeOutputDataType(const EDataType inputDataT
 
   if(inputDataType == EDT_Int || inputDataType == EDT_Float)
     inputComponentCount = 1;
-  else if (inputDataType == EDT_Vec2)
+  else if (inputDataType == EDT_Float2)
     inputComponentCount = 2;
-  else if (inputDataType == EDT_Vec3)
+  else if (inputDataType == EDT_Float3)
     inputComponentCount = 3;
-  else if (inputDataType == EDT_Vec4)
+  else if (inputDataType == EDT_Float4)
     inputComponentCount = 4;
 
   while(char c = *p++){
@@ -676,11 +761,11 @@ EDataType CppStackerBoxSwizzle::computeOutputDataType(const EDataType inputDataT
   if (inputComponentCount == 1)
     ret = inputDataType;
   if(inputComponentCount == 2)
-    ret = EDT_Vec2;
+    ret = EDT_Float2;
   else if (inputComponentCount == 3)
-    ret = EDT_Vec3;
+    ret = EDT_Float3;
   else if (inputComponentCount == 4)
-    ret = EDT_Vec4;
+    ret = EDT_Float4;
   else assert(0);
 
   return ret;
