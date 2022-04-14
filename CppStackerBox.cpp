@@ -421,7 +421,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       sprintf_s(str, sizeof(str), "%s v%d = (v%d).%s;\n",
         getTypeName(dataType),
         vIndex,
-        param0.vIndex,
+        param0.vIndex,  
         self.xyzw);
       *context.code += str;
     }
@@ -535,7 +535,7 @@ void CppStackerBoxConstant::drawBox(const StackerUI& stackerUI, const ImVec2 min
       //          ImGui::SliderFloat("", &value.x, minSlider, maxSlider);
       ImGui::TextUnformatted(str);
     }
-    else {
+    else if(colorUI) {
       // todo: show alpha as well
       ImVec4 col3(value.x, value.y, value.z, 1.0f);
       ImGui::PushStyleColor(ImGuiCol_Button, col3);
@@ -561,8 +561,17 @@ bool CppStackerBoxConstant::imGui() {
     ImGui::InputFloat("maxValue", &maxSlider);
   }
   else {
-    if (ImGui::ColorEdit4("Value", &value.x, 0))
-      ret = true;
+    ImGui::Checkbox("Color", &colorUI);
+    if(colorUI) {
+      if (ImGui::ColorEdit4("Value", &value.x, 0))
+        ret = true;
+    } else {
+      ImGui::InputFloat("minValue", &minSlider);
+      ImGui::InputFloat("maxValue", &maxSlider);
+
+      if (ImGui::SliderFloat4("Value", &value.x, minSlider, maxSlider))
+        ret = true;
+    }
   }
 
   return ret;

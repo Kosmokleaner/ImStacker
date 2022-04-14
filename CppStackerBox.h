@@ -89,6 +89,8 @@ public:
   ImVec4 value = {};
   float minSlider = 0.0f;
   float maxSlider = 1.0f;
+  // todo: enum
+  bool colorUI = true;
 
   // interface StackerBox ---------------------------------
 
