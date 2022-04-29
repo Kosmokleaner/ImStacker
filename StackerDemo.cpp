@@ -13,8 +13,7 @@ void init() {
     CppStackerBox* el = new CppStackerBox;
     el->validate();
     el->rect = rect;
-    el->nodeType = NT_Output;
-    el->name = "Output";
+    el->nodeType = NT_RGBOutput;
     g_stackerUI.stackerBoxes.push_back(el);
   }
   /*

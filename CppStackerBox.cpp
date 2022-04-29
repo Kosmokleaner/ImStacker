@@ -41,12 +41,29 @@ int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDat
   if (context.code) {
     const char* dstDataTypeStr = getGLSLTypeName(dstDataType);
     char str[256];
-    sprintf_s(str, sizeof(str), "%s v%d = %s(v%d);\n%s",
+
+    // cast int:float
+    // ivec2:vec2, ivec3:vec3, ivec4:vec4, float->vec2, float->vec3, float->vec4
+    const char* fmt = "%s v%d = %s(v%d);\n%s";
+
+    // expand by one
+    if(dataType == EDT_Float && dstDataType == EDT_Float2
+    || dataType == EDT_Float2 && dstDataType == EDT_Float3
+    || dataType == EDT_Float3 && dstDataType == EDT_Float4)
+      fmt = "%s v%d = %s(v%d, 0);\n%s";
+
+    // expand by two
+    if (dataType == EDT_Float && dstDataType == EDT_Float3
+      || dataType == EDT_Float2 && dstDataType == EDT_Float4)
+      fmt = "%s v%d = %s(v%d, 0, 0);\n%s";
+
+    sprintf_s(str, sizeof(str), fmt,
       dstDataTypeStr,
       context.nextFreeVIndex,
       dstDataTypeStr,
       vIndex,
       context.indentationStr);
+
     *context.code += str;
   }
 
@@ -161,7 +178,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
   ENTRY(CppStackerBox, Dot, "like HLSL dot(a, b)");
   ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
-  ENTRY(CppStackerBox, Output, "output vec4 as postprocess RGB color");
+  ENTRY(CppStackerBox, RGBOutput, "output vec4 as postprocess RGB color");
 
 #undef ENTRY
 
@@ -372,7 +389,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
-  if (context.params.size() == 1 && nodeType == NT_Output) {
+  if (context.params.size() == 1 && nodeType == NT_RGBOutput) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float4);
       sprintf_s(str, sizeof(str), "FragColor = v%d", paramVIndex);
@@ -638,6 +655,7 @@ bool CppStackerBoxConstant::imGui() {
 
   if(ImGui::Combo("ConstantType", (int*)&constantType, constantTypeUI)) {
     dataType = getDataType();
+    ret = true;
   }
 
   if (!(constantType == ECT_ColorRGB || constantType == ECT_ColorRGBA)) {

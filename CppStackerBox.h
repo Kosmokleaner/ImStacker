@@ -33,7 +33,7 @@ enum ENodeType {
   NT_Rand,
   NT_Time,
   NT_FragCoord,
-  NT_Output,
+  NT_RGBOutput,
   // -----------------
   NT_NodeTypeTerminator
 };
@@ -48,7 +48,7 @@ inline const char* enumToCStr(const ENodeType nodeType) {
       "Rand",
       "Time",
       "FragCoord",
-      "Output",
+      "RGBOutput",
   };
 
   if (nodeType < sizeof(tab) / sizeof(tab[0]))
