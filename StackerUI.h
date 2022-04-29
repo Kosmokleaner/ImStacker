@@ -84,10 +84,10 @@ public:
     // all mthods need to be implemented as thi class is also used as nUll implementation
     struct IAppConnection {
         virtual ~IAppConnection() {}
-        virtual void openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {}
+        virtual void openContextMenu(StackerUI& /*stackerUI*/, const StackerBoxRect& /*rect*/) {}
         // @param className must not be 0
         // @return 0 if failed
-        virtual StackerBox* createNode(const char* className) { return nullptr; }
+        virtual StackerBox* createNode(const char* /*className*/) { return nullptr; }
         virtual void startCompile() {}
         virtual std::string* code() { return nullptr; }
         virtual void endCompile() {};

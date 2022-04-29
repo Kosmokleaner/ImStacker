@@ -1,8 +1,12 @@
+// to prevent error C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead.
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #include "CppStackerBox.h"
 #include <vector>
 #include <assert.h>
 #include "imgui.h"
 #include "ShaderBox.h"
+
 
 #ifdef _WIN32
 // We rely on string literate compare for simpler code.
@@ -47,14 +51,14 @@ int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDat
     const char* fmt = "%s v%d = %s(v%d);\n%s";
 
     // expand by one
-    if(dataType == EDT_Float && dstDataType == EDT_Float2
-    || dataType == EDT_Float2 && dstDataType == EDT_Float3
-    || dataType == EDT_Float3 && dstDataType == EDT_Float4)
+    if((dataType == EDT_Float && dstDataType == EDT_Float2)
+    || (dataType == EDT_Float2 && dstDataType == EDT_Float3)
+    || (dataType == EDT_Float3 && dstDataType == EDT_Float4))
       fmt = "%s v%d = %s(v%d, 0);\n%s";
 
     // expand by two
-    if (dataType == EDT_Float && dstDataType == EDT_Float3
-      || dataType == EDT_Float2 && dstDataType == EDT_Float4)
+    if((dataType == EDT_Float && dstDataType == EDT_Float3)
+      || (dataType == EDT_Float2 && dstDataType == EDT_Float4))
       fmt = "%s v%d = %s(v%d, 0, 0);\n%s";
 
     sprintf_s(str, sizeof(str), fmt,
@@ -376,7 +380,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   // a-b
   if (context.params.size() == 2 && nodeType == NT_Sub) {
     if (context.code) {
-      CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
+      //CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = v%d - v%d; // %s\n",
         getGLSLTypeName(dataType),
         vIndex,
@@ -475,7 +479,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   // a/b
   if (context.params.size() == 2 && nodeType == NT_Div) {
     if (context.code) {
-      CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
+      //CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
       sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
         getGLSLTypeName(dataType),
         vIndex,
@@ -744,7 +748,7 @@ bool CppStackerBoxSwizzle::load(const rapidjson::Document::ValueType& doc) {
     return false;
   }
 
-  strcpy_s(xyzw, str);
+  strcpy(xyzw, str);
   return true;
 }
 
@@ -776,7 +780,7 @@ EDataType CppStackerBoxSwizzle::computeOutputDataType(const EDataType inputDataT
     // outside of range by default
     int32 componentIndex = 4;
 
-    c = tolower(c);
+    c = (char)tolower(c);
 
     if(c == 'x' || c == 'r')
       componentIndex = 0;

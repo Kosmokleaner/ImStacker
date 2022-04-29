@@ -108,14 +108,14 @@ public:
 
   // interface StackerBox ---------------------------------
 
-  virtual const char* getType() const { return "CppStackerBoxConstant"; }
+  virtual const char* getType() const override { return "CppStackerBoxConstant"; }
   virtual bool imGui() override;
-  virtual bool isVariable() const { return true; }
-  virtual bool canHaveInput() const { return false; }
-  virtual bool generateCode(GenerateCodeContext& context);
-  virtual bool load(const rapidjson::Document::ValueType& doc);
-  virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const;
-  virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR);
+  virtual bool isVariable() const override { return true; }
+  virtual bool canHaveInput() const override { return false; }
+  virtual bool generateCode(GenerateCodeContext& context) override;
+  virtual bool load(const rapidjson::Document::ValueType& doc) override;
+  virtual void save(rapidjson::Document& d, rapidjson::Value& objValue) const override;
+  virtual void drawBox(const StackerUI& stackerUI, const ImVec2 minR, const ImVec2 maxR) override;
 };
 
 // -------------------------------------------------------------------

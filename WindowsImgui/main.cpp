@@ -154,5 +154,9 @@ int main(int, char**)
   glfwDestroyWindow(window);
   glfwTerminate();
 
+  // todo: refactor
+  void deinit();
+  deinit();
+
   return 0;
 }

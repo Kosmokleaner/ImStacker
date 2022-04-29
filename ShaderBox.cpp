@@ -36,12 +36,12 @@ const char* fragment_shader_text1 =
 "}\n"
 "\n";
 
-static GLuint vertex_shader = -1;
-static GLuint g_program = -1;
-static GLuint g_vbo = -1;
-static GLuint g_idx = -1;
+static GLuint vertex_shader = (GLuint)-1;
+static GLuint g_program = (GLuint)-1;
+static GLuint g_vbo = (GLuint)-1;
+static GLuint g_idx = (GLuint)-1;
 // 0 is a valid uniform index, -1 can mean it was compiled out
-static GLuint uniform0 = -1;
+static GLuint uniform0 = (GLuint)-1;
 
 // If you get an error please report on GitHub. You may try different GL context version or GLSL version.
 // @param whatToCheck GL_LINK_STATUS for program or GL_COMPILE_STATUS for shaders
@@ -52,16 +52,20 @@ static bool checkProgram(GLuint handle, GLuint whatToCheck, const char* desc, st
   glGetProgramiv(handle, whatToCheck, &status);
   glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &log_length);
   if ((GLboolean)status == GL_FALSE) {
+#ifdef WIN32
     OutputDebugStringA("ERROR: ");
     OutputDebugStringA(desc);
     OutputDebugStringA("\n");
+#endif
   }
   if (log_length > 1)
   {
     ImVector<char> buf;
     buf.resize((int)(log_length + 1));
     glGetProgramInfoLog(handle, log_length, NULL, (GLchar*)buf.begin());
+#ifdef WIN32
     OutputDebugStringA(buf.begin());
+#endif
     warningsAndErrors = buf.begin();
   }
   return (GLboolean)status == GL_TRUE;
@@ -122,7 +126,7 @@ static void init() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
-static void deinit() {
+void deinit() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   glDeleteBuffers(1, &g_idx);
 
