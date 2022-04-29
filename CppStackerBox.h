@@ -31,6 +31,7 @@ enum ENodeType {
   NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp, NT_Dot,
   NT_Swizzle, // like UE4 ComponentMask and Append in one
   NT_Rand,
+  NT_Time,
   NT_FragCoord,
   NT_Output,
   // -----------------
@@ -45,6 +46,7 @@ inline const char* enumToCStr(const ENodeType nodeType) {
       "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp", "Dot",
       "Swizzle",
       "Rand",
+      "Time",
       "FragCoord",
       "Output",
   };

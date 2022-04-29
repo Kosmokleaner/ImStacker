@@ -40,7 +40,7 @@ static GLuint vertex_shader = -1;
 static GLuint g_program = -1;
 static GLuint g_vbo = -1;
 static GLuint g_idx = -1;
-// 0 is a valid uniform index, -1 can mean it was compieled out
+// 0 is a valid uniform index, -1 can mean it was compiled out
 static GLuint uniform0 = -1;
 
 // If you get an error please report on GitHub. You may try different GL context version or GLSL version.
@@ -158,8 +158,10 @@ void drawDemo() {
   glEnableVertexAttribArray(0);
 
   float mat[16] = { 0 };
-  // [0] = random 0..1
+  // [0][0] = random 0..1
   mat[0] = rand() / (float)RAND_MAX;
+  // [0][1] = time in seconds, precision loss when getting larger, best to also expose frac(time)
+  mat[1] = (float)ImGui::GetTime();
 
   glUniformMatrix4fv(uniform0, 1, GL_FALSE, mat);
 

@@ -13,7 +13,7 @@
 #endif
 
 // literal (number, slider): bool, int, float, string, color, bitmap, struct? float slider
-// input: time, pixelpos, camera
+// input: camera
 // conversion float->int, int->float, int->string, string->int,  ...
 // + - * / pow(a, b), sin(), cos(), frac()
 // get_var, set_var
@@ -135,6 +135,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     } \
     imguiToolTip(tooltip);
 
+  // no input
 //    ENTRY(IntVariable, "Integer variable (no fractional part)");
   ENTRY_CONSTANT(Constant, CppStackerBoxConstant::ECT_Float, "Floating point constant (with fractional part)");
 //  ENTRY_CONSTANT(Vec2 Constant, CppStackerBoxConstant::ECT_Float2, "Float2 constant");
@@ -142,21 +143,25 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
 //  ENTRY_CONSTANT(Vec4 Constant, CppStackerBoxConstant::ECT_Float4, "Float4 constant");
 //  ENTRY_CONSTANT(RGB Constant, CppStackerBoxConstant::ECT_ColorRGB, "Color RGB constant");
 //  ENTRY_CONSTANT(RGBA Constant, CppStackerBoxConstant::ECT_RGBA, "Color RGBA constant");
+  ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
+  ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
+  ENTRY(CppStackerBox, Time, "float time in seconds (precision loss when large)");
   ImGui::Separator();
-  ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
-  ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
-  ENTRY(CppStackerBox, Mul, "Multiple multiple numbers");
-  ENTRY(CppStackerBox, Div, "Divide two numbers, 1/x a single number");
+  // one input
   ENTRY(CppStackerBox, Sin, "Sin() in radiants");
   ENTRY(CppStackerBox, Cos, "Cos() in radiants");
   ENTRY(CppStackerBox, Frac, "like HLSL frac() = x-floor(x)");
   ENTRY(CppStackerBox, Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
+  ImGui::Separator();
+  // two inputs
+  ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
+  ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
+  ENTRY(CppStackerBox, Mul, "Multiple multiple numbers");
+  ENTRY(CppStackerBox, Div, "Divide two numbers, 1/x a single number");
   ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
   ENTRY(CppStackerBox, Dot, "like HLSL dot(a, b)");
-  ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
   ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
-  ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
-  ENTRY(CppStackerBox, Output, "output vec4 as postprocess");
+  ENTRY(CppStackerBox, Output, "output vec4 as postprocess RGB color");
 
 #undef ENTRY
 
@@ -277,6 +282,18 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
+  if (context.params.size() == 0 && nodeType == NT_Time) {
+    if (context.code) {
+      dataType = EDT_Float;
+      sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][1]; // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
 
   dataType = EDT_Void;
 
