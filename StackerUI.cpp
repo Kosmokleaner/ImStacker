@@ -859,6 +859,7 @@ void StackerUI::generatedCodeUI() {
 
   ImGui::SameLine();
   if (ImGui::Button("  Load  ")) {
+    freeData();
     load(fileName);
     dirty = true;
   }
