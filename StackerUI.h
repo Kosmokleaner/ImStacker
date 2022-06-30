@@ -166,6 +166,8 @@ public:
     void clipboardCopy();
     //
     void clipboardPaste();
+    //
+    void cutCopyPasteMenu();
 
 private:
     IAppConnection nullAppConnection;

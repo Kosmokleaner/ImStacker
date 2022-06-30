@@ -54,18 +54,6 @@ void StackerBox::save(Document& d, rapidjson::Value& objValue) const {
   }
 }
 
-/*
-if (ImGui::MenuItem("Cut", "CTRL+X", false, !level.selection.empty())) {
-    clipboardCut();
-}
-if (ImGui::MenuItem("Copy", "CTRL+C", false, !level.selection.empty())) {
-    clipboardCopy();
-}
-if (ImGui::MenuItem("Paste", "CTRL+V", false, !editor.clipboard.empty())) {
-    clipboardPaste();
-}
-*/
-
 // ----------------------------------------------------------------------------
 
 void StackerUI::freeData() {
@@ -170,6 +158,19 @@ StackerUI::~StackerUI() {
   freeData();
 }
 
+void StackerUI::cutCopyPasteMenu() {
+  if (ImGui::MenuItem("Cut", "CTRL+X", nullptr, !selectedObjects.empty())) {
+    clipboardCut();
+  }
+  if (ImGui::MenuItem("Copy", "CTRL+C", nullptr, !selectedObjects.empty())) {
+    clipboardCopy();
+  }
+  const char* txt = ImGui::GetClipboardText();
+  if (ImGui::MenuItem("Paste", "CTRL+V", nullptr, *txt)) {
+    clipboardPaste();
+  }
+}
+
 void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
   ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
   if (ImGui::BeginPopup("context menu")) {
@@ -208,15 +209,7 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
       appConnection->openContextMenu(*this, stackerBoxRect);
     }
     else {
-      if (ImGui::MenuItem("Cut", "CTRL+X")) {
-        clipboardCut();
-      }
-      if (ImGui::MenuItem("Copy", "CTRL+C")) {
-        clipboardCopy();
-      }
-      if (ImGui::MenuItem("Paste", "CTRL+V")) {
-        clipboardPaste();
-      }
+      cutCopyPasteMenu();
     }
     contextMenuIsOpen = true;
     ImGui::EndPopup();
@@ -564,7 +557,9 @@ void StackerUI::selectObject(const int32 id, const bool shift) {
 void drawHatchedRect(const ImVec2 minR, const ImVec2 maxR, ImU32 col) {
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-  for(float y = minR.y; y < maxR.y; y += 5) {
+  const float step = 4;
+
+  for(float y = minR.y + 1.0f; y < maxR.y; y += step) {
     draw_list->AddLine(ImVec2(minR.x, y), ImVec2(maxR.x, y), col, 2.0f);
   }
 }

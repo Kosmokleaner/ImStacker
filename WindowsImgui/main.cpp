@@ -138,8 +138,8 @@ int main(int, char**)
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    void drawDemo();
-    drawDemo();
+    void drawDemo(int, int);
+    drawDemo(display_w, display_h);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

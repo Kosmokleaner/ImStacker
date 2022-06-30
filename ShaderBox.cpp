@@ -187,7 +187,7 @@ void deinit() {
   glDeleteBuffers(1, &g_vbo);
 }
 
-void drawDemo() {
+void drawDemo(int width, int height) {
   static bool first = true;
 
   if (first) {
@@ -219,6 +219,11 @@ void drawDemo() {
   mat[0] = rand() / (float)RAND_MAX;
   // [0][1] = time in seconds, precision loss when getting larger, best to also expose frac(time)
   mat[1] = (float)ImGui::GetTime();
+  // [1][0] = (screenSize.x,screenSize.y, 1/screenSize.x, 1/screenSize.y) 
+  mat[4 * 1 + 0] = (float)width;
+  mat[4 * 1 + 1] = (float)height;
+  mat[4 * 1 + 2] = 1.0f / width;
+  mat[4 * 1 + 3] = 1.0f / height;
 
   glUniformMatrix4fv(uniform0, 1, GL_FALSE, mat);
 
@@ -231,7 +236,7 @@ void drawDemo() {
 }
 
 #else // SHADER_SUPPORT == 1
-void drawDemo() {}
+void drawDemo(int width, int height) {}
 void recompileShaders(const char* /*inCode*/, std::string& /*warningsAndErrors*/) {}
 void deinit() {}
 #endif // SHADER_SUPPORT == 1

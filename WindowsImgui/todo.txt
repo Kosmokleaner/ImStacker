@@ -3,8 +3,13 @@
 * tooltip when hovering over box
 * show yellow (warning) X if a node output is needs to be connected
 * App icon
-* grab handles visualized differently
-
+* make function
+* screen/window size
+* utility functions e.g. sphereMask, length
+* paste should insert where cursor is
+* separate visuals from coding e.g. make it a roadmap tool
+* see inbetween values as color / image / number
+* comment box behind nodes, move nodes with it
 
 // todo:
 // * properties in line ?
@@ -20,7 +25,5 @@
 // * zoom in/out    io.MouseWheel
 // * set variable can have only one input but it can have 2 triangles
 // * ctrl-A to select all, menu item
-// * delete key
-// * left and right side one grid cell diagonal pattern or dotted rubber to grab
 // * right mouse with minor mouse movement should still show context menu
 // * each cross should have tooltip with error

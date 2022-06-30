@@ -56,18 +56,18 @@ int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDat
 
     // cast int:float
     // ivec2:vec2, ivec3:vec3, ivec4:vec4, float->vec2, float->vec3, float->vec4
-    const char* fmt = "%s v%d = %s(v%d);\n%s";
+    const char* fmt = "%s v%d = %s(v%d);\n%s\n";
 
     // expand by one
     if((dataType == EDT_Float && dstDataType == EDT_Float2)
     || (dataType == EDT_Float2 && dstDataType == EDT_Float3)
     || (dataType == EDT_Float3 && dstDataType == EDT_Float4))
-      fmt = "%s v%d = %s(v%d, 0);\n%s";
+      fmt = "%s v%d = %s(v%d, 0);\n%s\n";
 
     // expand by two
     if((dataType == EDT_Float && dstDataType == EDT_Float3)
       || (dataType == EDT_Float2 && dstDataType == EDT_Float4))
-      fmt = "%s v%d = %s(v%d, 0, 0);\n%s";
+      fmt = "%s v%d = %s(v%d, 0, 0);\n%s\n";
 
     sprintf_s(str, sizeof(str), fmt,
       dstDataTypeStr,
@@ -164,42 +164,55 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     } \
     imguiToolTip(tooltip);
 
-  // no input
-//    ENTRY(IntVariable, "Integer variable (no fractional part)");
-  ENTRY_CONSTANT(Constant, CppStackerBoxConstant::ECT_Float, "Floating point constant (with fractional part)\ne.g. Float, Float2, Float3, Float4, ColorRGB, ColorRGBA");
-//  ENTRY_CONSTANT(Vec2 Constant, CppStackerBoxConstant::ECT_Float2, "Float2 constant");
-//  ENTRY_CONSTANT(Vec3 Constant, CppStackerBoxConstant::ECT_Float3, "Float3 constant");
-//  ENTRY_CONSTANT(Vec4 Constant, CppStackerBoxConstant::ECT_Float4, "Float4 constant");
-//  ENTRY_CONSTANT(RGB Constant, CppStackerBoxConstant::ECT_ColorRGB, "Color RGB constant");
-//  ENTRY_CONSTANT(RGBA Constant, CppStackerBoxConstant::ECT_RGBA, "Color RGBA constant");
-  ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
-  ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
-  ENTRY(CppStackerBox, Time, "float time in seconds (precision loss when large)");
+  {
+    ImGui::TextDisabled("No input");
+    ImGui::Indent();
+  //    ENTRY(IntVariable, "Integer variable (no fractional part)");
+    ENTRY_CONSTANT(Constant, CppStackerBoxConstant::ECT_Float, "Floating point constant (with fractional part)\ne.g. Float, Float2, Float3, Float4, ColorRGB, ColorRGBA");
+  //  ENTRY_CONSTANT(Vec2 Constant, CppStackerBoxConstant::ECT_Float2, "Float2 constant");
+  //  ENTRY_CONSTANT(Vec3 Constant, CppStackerBoxConstant::ECT_Float3, "Float3 constant");
+  //  ENTRY_CONSTANT(Vec4 Constant, CppStackerBoxConstant::ECT_Float4, "Float4 constant");
+  //  ENTRY_CONSTANT(RGB Constant, CppStackerBoxConstant::ECT_ColorRGB, "Color RGB constant");
+  //  ENTRY_CONSTANT(RGBA Constant, CppStackerBoxConstant::ECT_RGBA, "Color RGBA constant");
+    ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
+    ENTRY(CppStackerBox, ScreenUV, "screen xy in 0..1 range");
+    ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
+    ENTRY(CppStackerBox, Time, "float time in seconds (precision loss when large)");
+    ImGui::Unindent();
+  }
+
   ImGui::Separator();
-  // one input
-  ENTRY(CppStackerBox, Sin, "Sin() in radiants");
-  ENTRY(CppStackerBox, Cos, "Cos() in radiants");
-  ENTRY(CppStackerBox, Frac, "like HLSL frac() = x-floor(x)");
-  ENTRY(CppStackerBox, Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
+
+  {
+    ImGui::TextDisabled("One input");
+    ImGui::Indent();
+    ENTRY(CppStackerBox, Sin, "Sin() in radiants");
+    ENTRY(CppStackerBox, Cos, "Cos() in radiants");
+    ENTRY(CppStackerBox, Frac, "like HLSL frac() = x-floor(x)");
+    ENTRY(CppStackerBox, Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
+    ENTRY(CppStackerBox, Sqrt, "like HLSL sqrt(), square root");
+    ImGui::Unindent();
+  }
   ImGui::Separator();
-  // two inputs
-  ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
-  ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
-  ENTRY(CppStackerBox, Mul, "Multiple multiple numbers");
-  ENTRY(CppStackerBox, Div, "Divide two numbers, 1/x a single number");
-  ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
-  ENTRY(CppStackerBox, Dot, "like HLSL dot(a, b)");
-  ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
-  ENTRY(CppStackerBox, RGBOutput, "output vec4 as postprocess RGB color");
+
+  {
+    ImGui::TextDisabled("Two or more inputs");
+    ImGui::Indent();  
+    ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
+    ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
+    ENTRY(CppStackerBox, Mul, "Multiple multiple numbers");
+    ENTRY(CppStackerBox, Div, "Divide two numbers, 1/x a single number");
+    ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
+    ENTRY(CppStackerBox, Dot, "like HLSL dot(a, b), dot(a,a) if there is no b");
+    ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
+    ENTRY(CppStackerBox, RGBOutput, "output vec4 as postprocess RGB color (Alpha is ignored)");
+    ImGui::Unindent();
+  }
 
 #undef ENTRY
 
-  if (ImGui::GetClipboardText()) {
-    ImGui::Separator();
-    if (ImGui::MenuItem("Paste", "CTRL+V")) {
-      stackerUI.clipboardPaste();
-    }
-  }
+  ImGui::Separator();
+  stackerUI.cutCopyPasteMenu();
 }
 
 const char* getGLSLTypeName(const EDataType dataType) {
@@ -285,7 +298,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
   char str[256];
 
-  if (context.params.size() == 0 && nodeType == NT_FragCoord) {
+  if (nodeType == NT_FragCoord && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float4;
       sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord; // %s\n",
@@ -298,7 +311,20 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
-  if (context.params.size() == 0 && nodeType == NT_Rand) {
+  if (nodeType == NT_ScreenUV && context.params.size() == 0) {
+    if (context.code) {
+      dataType = EDT_Float2;
+      sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord.xy * uniform0[1].zw; // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
+  if (nodeType == NT_Rand && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float;
       sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][0]; // %s\n",
@@ -311,7 +337,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
-  if (context.params.size() == 0 && nodeType == NT_Time) {
+  if (nodeType == NT_Time && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float;
       sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][1]; // %s\n",
@@ -357,11 +383,16 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         param0VIndex);
       validate();
       *context.code += str;
+      
+      // todo: implement max Parameter count
+      int32 paramNVIndex[16];
+      for (size_t i = 1, count = context.params.size(); i < count; ++i) {
+        paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
+      }
 
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
-        int32 paramNVIndex = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
         sprintf_s(str, sizeof(str), " + v%d",
-          paramNVIndex);
+          paramNVIndex[i]);
 
         *context.code += str;
       }
@@ -426,10 +457,15 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         param0VIndex);
       *context.code += str;
 
+      // todo: implement max Parameter count
+      int32 paramNVIndex[16];
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
-        int32 paramNVIndex = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
+        paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
+      }
+
+      for (size_t i = 1, count = context.params.size(); i < count; ++i) {
         sprintf_s(str, sizeof(str), " * v%d",
-          paramNVIndex);
+          paramNVIndex[i]);
 
         *context.code += str;
       }
@@ -440,23 +476,43 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
-  if (nodeType == NT_Dot && context.params.size() == 2) {
-    dataType = EDT_Float;
-    if (context.code) {
-      CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
-      int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
-      int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
-      sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
-        getGLSLTypeName(dataType),
-        vIndex,
-        param0VIndex,
-        param1VIndex,
-        name.c_str()
-      );
-      *context.code += str;
+  // dot product
+  if (nodeType == NT_Dot) {
+    if (context.params.size() == 1) {
+      // dot product with itself
+      dataType = EDT_Float;
+      if (context.code) {
+        sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
+          getGLSLTypeName(dataType),
+          vIndex,
+          param0.vIndex,
+          param0.vIndex,
+          name.c_str()
+        );
+        *context.code += str;
+      }
+      validate();
+      return true;
     }
-    validate();
-    return true;
+    else if(context.params.size() == 2) {
+      // dot(a,b)
+      dataType = EDT_Float;
+      if (context.code) {
+        CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
+        int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
+        int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
+        sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
+          getGLSLTypeName(dataType),
+          vIndex,
+          param0VIndex,
+          param1VIndex,
+          name.c_str()
+        );
+        *context.code += str;
+      }
+      validate();
+      return true;
+    }
   }
 
   if (nodeType == NT_Swizzle && context.params.size() == 1) {
@@ -511,8 +567,53 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     }
   }
 
+  // Saturate
+  if (nodeType == NT_Saturate && context.params.size() == 1) {
+    if (context.code) {
+      int32 paramVIndex = param0.castTo(context, EDT_Float);
+      sprintf_s(str, sizeof(str), "%s v%d = clamp(v%d, 0.0f, 1.0f); // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        paramVIndex,
+        name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
+  // Frac
+  if (nodeType == NT_Frac && context.params.size() == 1) {
+    if (context.code) {
+      int32 paramVIndex = param0.castTo(context, EDT_Float);
+      sprintf_s(str, sizeof(str), "%s v%d = fract(v%d); // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        paramVIndex,
+        name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
+  // Sqrt
+  if (nodeType == NT_Sqrt && context.params.size() == 1) {
+    if (context.code) {
+      int32 paramVIndex = param0.castTo(context, EDT_Float);
+      sprintf_s(str, sizeof(str), "%s v%d = sqrt(v%d); // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        paramVIndex,
+        name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
   // Sin
-  if (context.params.size() == 1 && nodeType == NT_Sin) {
+  if (nodeType == NT_Sin && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
       sprintf_s(str, sizeof(str), "%s v%d = sin(v%d); // %s\n",
@@ -527,7 +628,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   }
 
   // Cos
-  if (context.params.size() == 1 && nodeType == NT_Cos) {
+  if (nodeType == NT_Cos && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
       sprintf_s(str, sizeof(str), "%s v%d = cos(v%d); // %s\n",
@@ -676,14 +777,9 @@ bool CppStackerBoxConstant::imGui() {
   if (CppStackerBox::imGui())
     ret = true;
 
-  if(ImGui::Combo("ConstantType", (int*)&constantType, constantTypeUI)) {
+  if(ImGui::Combo("Type", (int*)&constantType, constantTypeUI)) {
     dataType = getDataType();
     ret = true;
-  }
-
-  if (!(constantType == ECT_ColorRGB || constantType == ECT_ColorRGBA)) {
-      ImGui::InputFloat("minValue", &minSlider);
-      ImGui::InputFloat("maxValue", &maxSlider);
   }
 
   if(constantType == ECT_Float) {
@@ -710,6 +806,13 @@ bool CppStackerBoxConstant::imGui() {
   else if (constantType == ECT_Float4) {
     if (ImGui::SliderFloat4("Value", &value.x, minSlider, maxSlider))
       ret = true;
+  }
+
+  ImGui::Separator();
+
+  if (!(constantType == ECT_ColorRGB || constantType == ECT_ColorRGBA)) {
+    ImGui::InputFloat("min Slider", &minSlider);
+    ImGui::InputFloat("max Slider", &maxSlider);
   }
 
   return ret;
