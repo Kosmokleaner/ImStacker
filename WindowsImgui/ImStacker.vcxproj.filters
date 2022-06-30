@@ -99,4 +99,7 @@
   <ItemGroup>
     <Text Include="todo.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon.ico" />
+  </ItemGroup>
 </Project>

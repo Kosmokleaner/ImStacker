@@ -2,7 +2,6 @@
 
 * tooltip when hovering over box
 * show yellow (warning) X if a node output is needs to be connected
-* App icon
 * make function
 * screen/window size
 * utility functions e.g. sphereMask, length
@@ -10,6 +9,7 @@
 * separate visuals from coding e.g. make it a roadmap tool
 * see inbetween values as color / image / number
 * comment box behind nodes, move nodes with it
+* 1-x 
 
 // todo:
 // * properties in line ?

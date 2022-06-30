@@ -166,7 +166,7 @@ void StackerUI::cutCopyPasteMenu() {
     clipboardCopy();
   }
   const char* txt = ImGui::GetClipboardText();
-  if (ImGui::MenuItem("Paste", "CTRL+V", nullptr, *txt)) {
+  if (ImGui::MenuItem("Paste", "CTRL+V", nullptr, txt && *txt)) {
     clipboardPaste();
   }
 }
