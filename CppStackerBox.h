@@ -102,7 +102,7 @@ public:
 
   ImVec4 value = {};
   float minSlider = 0.0f;
-  float maxSlider = 1.0f;
+  float maxSlider = 1000.0f;
 
   EDataType getDataType() const;
 
