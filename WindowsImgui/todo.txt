@@ -1,0 +1,26 @@
+
+
+* tooltip when hovering over box
+* show yellow (warning) X if a node output is needs to be connected
+* App icon
+* grab handles visualized differently
+
+
+// todo:
+// * properties in line ?
+//   e.g. double click to rename
+//   right mouse to edit properties
+//   left mouse to edit properties in popup
+// * load / save filename
+// * 2 demo windows
+
+// polish / later
+// * undo/redo ?
+// * min box width should be at least 2 or 3 grid cells
+// * zoom in/out    io.MouseWheel
+// * set variable can have only one input but it can have 2 triangles
+// * ctrl-A to select all, menu item
+// * delete key
+// * left and right side one grid cell diagonal pattern or dotted rubber to grab
+// * right mouse with minor mouse movement should still show context menu
+// * each cross should have tooltip with error

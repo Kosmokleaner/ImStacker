@@ -96,4 +96,7 @@
       <Filter>glfw</Filter>
     </Library>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
+  </ItemGroup>
 </Project>

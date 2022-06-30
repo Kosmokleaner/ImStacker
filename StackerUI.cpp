@@ -14,27 +14,6 @@
 
 using namespace rapidjson;
 
-// todo:
-// * properties in line ?
-//   e.g. double click to rename
-//   right mouse to edit properties
-//   left mouse to edit properties in popup
-// * load / save filename
-// * 2 demo windows
-
-// polish / later
-// * undo/redo ?
-// * min box width should be at least 2 or 3 grid cells
-// * zoom in/out    io.MouseWheel
-// * set variable can have only one input but it can have 2 triangles
-// * ctrl-A to select all, menu item
-// * delete key
-// * left and right side one grid cell diagonal pattern or dotted rubber to grab
-// * right mouse with minor mouse movement should still show context menu
-// * each cross should have tooltip with error
-
-
-
 StackerBox::StackerBox() {
 }
 
@@ -582,6 +561,13 @@ void StackerUI::selectObject(const int32 id, const bool shift) {
   }
 }
 
+void drawHatchedRect(const ImVec2 minR, const ImVec2 maxR, ImU32 col) {
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+  for(float y = minR.y; y < maxR.y; y += 5) {
+    draw_list->AddLine(ImVec2(minR.x, y), ImVec2(maxR.x, y), col, 2.0f);
+  }
+}
 
 void StackerUI::drawBoxes(const ImVec2 offset, int32 hoverObjectId, const uint32 hoverHandle) {
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -637,11 +623,19 @@ void StackerUI::drawBoxes(const ImVec2 offset, int32 hoverObjectId, const uint32
       draw_list->AddRectFilled(hoverMinR, hoverMaxR, 0x44ffffff, 4.0f);
     }
 
-    ImGui::PushClipRect(ImVec2(minR.x + clipBorderSize, minR.y), ImVec2(maxR.x - clipBorderSize, maxR.y), true);
+    {
+      // cliprect is to confine text into the box
+      ImGui::PushClipRect(ImVec2(minR.x + clipBorderSize, minR.y), ImVec2(maxR.x - clipBorderSize, maxR.y), true);
 
-    ref.drawBox(*this, minR, maxR);
+      ref.drawBox(*this, minR, maxR);
 
-    ImGui::PopClipRect();
+      ImGui::PopClipRect();
+
+      drawHatchedRect(ImVec2(minR.x + clipBorderSize, minR.y + clipBorderSize), ImVec2(minR.x + handleSizeX - clipBorderSize / 2, maxR.y - clipBorderSize), 0x33000000);
+      if(maxR.x - minR.x > handleSizeX) {
+        drawHatchedRect(ImVec2(maxR.x - handleSizeX + clipBorderSize / 2, minR.y + clipBorderSize), ImVec2(maxR.x - clipBorderSize, maxR.y - clipBorderSize), 0x33000000);
+      }
+    }
 
     if (ref.compileError) {
       ImVec2 mid((minR.x + maxR.x) * 0.5f, (minR.y + maxR.y) * 0.5f);

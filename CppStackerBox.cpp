@@ -166,7 +166,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
 
   // no input
 //    ENTRY(IntVariable, "Integer variable (no fractional part)");
-  ENTRY_CONSTANT(Constant, CppStackerBoxConstant::ECT_Float, "Floating point constant (with fractional part)");
+  ENTRY_CONSTANT(Constant, CppStackerBoxConstant::ECT_Float, "Floating point constant (with fractional part)\ne.g. Float, Float2, Float3, Float4, ColorRGB, ColorRGBA");
 //  ENTRY_CONSTANT(Vec2 Constant, CppStackerBoxConstant::ECT_Float2, "Float2 constant");
 //  ENTRY_CONSTANT(Vec3 Constant, CppStackerBoxConstant::ECT_Float3, "Float3 constant");
 //  ENTRY_CONSTANT(Vec4 Constant, CppStackerBoxConstant::ECT_Float4, "Float4 constant");
