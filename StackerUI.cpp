@@ -248,6 +248,11 @@ void StackerUI::panelUI() {
 
   ImGuiIO& io = ImGui::GetIO();
 
+  ImGui::SetNextWindowPos(ImVec2(600, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSizeConstraints(ImVec2(300, 300), ImVec2(FLT_MAX, FLT_MAX));
+  ImGui::SetNextWindowBgAlpha(1.0f);
+
   // todo: make UI not in a window so it can be combined with other UI
   ImGui::Begin("Stacker Panel", &showStackerPanelWindow, ImGuiWindowFlags_NoCollapse);
 
@@ -847,11 +852,13 @@ void StackerUI::save(const char* fileName) {
 }
 
 void StackerUI::generatedCodeUI() {
-  ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowBgAlpha(1.0f);
-
   if (!showStackerCodeWindow)
     return;
+
+  ImGui::SetNextWindowPos(ImVec2(200, 200), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(400, 600), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSizeConstraints(ImVec2(400, 200), ImVec2(FLT_MAX, FLT_MAX));
+  ImGui::SetNextWindowBgAlpha(1.0f);
 
   ImGui::Begin("Stacker Code", &showStackerCodeWindow, ImGuiWindowFlags_NoCollapse);
 
@@ -899,12 +906,13 @@ void StackerUI::generatedCodeUI() {
 
 
 void StackerUI::propertiesUI() {
-  ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowBgAlpha(1.0f);
-
-
   if (!showStackerPropertiesWindow)
     return;
+
+  ImGui::SetNextWindowPos(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSizeConstraints(ImVec2(400, 200), ImVec2(FLT_MAX, FLT_MAX));
+  ImGui::SetNextWindowBgAlpha(1.0f);
 
   // todo: make UI not in a window so it can be combined with other UI
   ImGui::Begin("Stacker Properties", &showStackerPropertiesWindow, ImGuiWindowFlags_NoCollapse);
