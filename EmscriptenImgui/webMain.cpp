@@ -50,9 +50,31 @@ int main(int, char**)
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_DisplayMode current;
     SDL_GetCurrentDisplayMode(0, &current);
+    // SDL_WINDOW_ALLOW_HIGHDPI, https://github.com/ocornut/imgui/issues/4768
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    g_Window = SDL_CreateWindow("ImStacker Emscripten example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+
+
+    if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+    {
+      printf("Warning: Linear texture filtering not enabled!");
+    }
+
+#ifdef __EMSCRIPTEN__
+    int width = 1024;
+    int height = 768;
+//    emscripten_set_canvas_element_size("#canvas", width, height);
+//    EmscriptenFullscreenChangeEvent fs = 0;
+//    emscripten_set_canvas_element_size("#canvas", width, height);
+ //   emscripten_get_canvas_element_size(&width, &height, &fs);
+//    emscripten_get_canvas_element_size("#canvas", &width, &height);
+//    emscripten_get_fullscreen_status(&fs);
+
+    //	emscripten_set_canvas_size(width, height); // using SDL_SetVideoMode 
+#endif
+
+    g_Window = SDL_CreateWindow("ImStacker Emscripten example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
     g_GLContext = SDL_GL_CreateContext(g_Window);
+
     if (!g_GLContext)
     {
         fprintf(stderr, "Failed to initialize WebGL context!\n");
@@ -129,18 +151,8 @@ static void main_loop(void* arg)
     void stacker_demo();
     stacker_demo();
 
-
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-    {
-        ImGui::Begin("Hello, world!");                                // Create a window called "Hello, world!" and append into it.
-        ImGui::Checkbox("Demo Window", &show_demo_window);            // Edit bools storing our window open/close state
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::End();
-    }
-
     // Rendering
     ImGui::Render();
-
 
     SDL_GL_MakeCurrent(g_Window, g_GLContext);
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
