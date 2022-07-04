@@ -232,14 +232,24 @@ void StackerUI::setAppConnection(IAppConnection* inAppConnection) {
   appConnection = inAppConnection ? inAppConnection : &nullAppConnection;
 }
 
-void StackerUI::draw() {
-  ImGuiIO& io = ImGui::GetIO();
 
+void StackerUI::draw() {
   ImGui::SetNextWindowSize(ImVec2(700, 600), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowBgAlpha(1.0f);
 
+  panelUI();
+  propertiesUI();
+  generatedCodeUI();
+}
+
+void StackerUI::panelUI() {
+  if(!showStackerPanelWindow)
+    return;
+
+  ImGuiIO& io = ImGui::GetIO();
+
   // todo: make UI not in a window so it can be combined with other UI
-  ImGui::Begin("Stacker", 0, ImGuiWindowFlags_NoCollapse);
+  ImGui::Begin("Stacker Panel", &showStackerPanelWindow, ImGuiWindowFlags_NoCollapse);
 
   ImGui::BeginChild("scrolling_region", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
 
@@ -462,9 +472,6 @@ void StackerUI::draw() {
   else {
     mouseDelta = {};
   }
-
-  propertiesUI();
-  generatedCodeUI();
 
   // debug
 //    ImGui::Text("sel:%d hnd:%d mouse:(%.1f %.1f)", selectedObject, selectedHandle, mousePos.x, mousePos.y);
@@ -843,7 +850,10 @@ void StackerUI::generatedCodeUI() {
   ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowBgAlpha(1.0f);
 
-  ImGui::Begin("Stacker generated Code", 0, ImGuiWindowFlags_NoCollapse);
+  if (!showStackerCodeWindow)
+    return;
+
+  ImGui::Begin("Stacker Code", &showStackerCodeWindow, ImGuiWindowFlags_NoCollapse);
 
   if (ImGui::Button("  New  ")) {
     freeData();
@@ -892,8 +902,12 @@ void StackerUI::propertiesUI() {
   ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowBgAlpha(1.0f);
 
+
+  if (!showStackerPropertiesWindow)
+    return;
+
   // todo: make UI not in a window so it can be combined with other UI
-  ImGui::Begin("Stacker Properties", 0, ImGuiWindowFlags_NoCollapse);
+  ImGui::Begin("Stacker Properties", &showStackerPropertiesWindow, ImGuiWindowFlags_NoCollapse);
 
   for (auto it = selectedObjects.begin(); it != selectedObjects.end(); ++it) {
     const uint32 index = *it;

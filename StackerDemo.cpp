@@ -63,6 +63,10 @@ void stacker_demo() {
   {
     if (ImGui::BeginMenu("Windows"))
     {
+      ImGui::MenuItem("Stacker Panel", 0, &g_stackerUI.showStackerPanelWindow);
+      ImGui::MenuItem("Stacker Code", 0, &g_stackerUI.showStackerCodeWindow);
+      ImGui::MenuItem("Stacker Properties", 0, &g_stackerUI.showStackerPropertiesWindow);
+      ImGui::Separator();
       ImGui::MenuItem("Im Demo Window", 0, &show_demo_window);
       ImGui::EndMenu();
     }

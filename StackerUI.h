@@ -119,6 +119,11 @@ public:
     float scrollingAmount = 0.0f;
     bool contextMenuIsOpen = false;
     bool autoGenerateCode = true;
+
+    bool showStackerPanelWindow = true;
+    bool showStackerCodeWindow = true;
+    bool showStackerPropertiesWindow = true;
+
     // if true it will trigger a recompile
     bool dirty = true;
 
@@ -154,6 +159,8 @@ public:
     void addFromUI(StackerBox& in);
     //
     void draw();
+    //
+    void panelUI();
     // @param fileName must not be 0
     bool load(const char* fileName);
     // @param fileName must not be 0

@@ -38,7 +38,11 @@ const char* fragment_shader_text0 =
 "\n"
 "void main()\n"
 "{\n"
-"  vec4 ret = vec4(0.0, 1.0, 0.0, 1.0);\n\n";
+"  vec2 checker2 = vec2(floor(gl_FragCoord.x / 16.0), floor(gl_FragCoord.y / 16.0));\n"
+"  float checker1a = fract(checker2.x * 0.5) * 2.0;\n"
+"  float checker1b = fract(checker2.y * 0.5) * 2.0;\n"
+"  float checker1 = mix(checker1a, 1.0 - checker1a, checker1b);\n"
+"  vec4 ret = vec4(1.0, 1.0, 1.0, 1.0) * mix(0.45, 0.55, checker1);\n\n";
 
 const char* fragment_shader_text1 =
 "  gl_FragColor = ret;\n"
