@@ -91,6 +91,7 @@ public:
         virtual void startCompile() {}
         virtual std::string* code() { return nullptr; }
         virtual void endCompile() {};
+        virtual void reCompile() {};
         // @return 0 if there are no warnings and errors
         virtual const char* getWarningsAndErrors() { return nullptr; }
     };
@@ -183,6 +184,8 @@ private:
     void propertiesUI();
     // @param fullMode false:verify only, true: generate code
     void generateCode(const bool fullMode);
+    //
+    void reCompile();
     //
     void generatedCodeUI();
     //

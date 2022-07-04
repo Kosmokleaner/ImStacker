@@ -3,6 +3,7 @@
 #include "rapidjson/prettywriter.h"
 #include "StackerUI.h"
 #include "ShaderBox.h"
+#include <imgui_stdlib.h>
 #include <assert.h>
 #include <math.h> // floorf
 #include <sys/stat.h>
@@ -238,7 +239,7 @@ void StackerUI::draw() {
   ImGui::SetNextWindowBgAlpha(1.0f);
 
   // todo: make UI not in a window so it can be combined with other UI
-  ImGui::Begin("Stacker");
+  ImGui::Begin("Stacker", 0, ImGuiWindowFlags_NoCollapse);
 
   ImGui::BeginChild("scrolling_region", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
 
@@ -756,6 +757,9 @@ void StackerUI::buildOrder() {
   std::sort(order.begin(), order.end(), processingSortOrder);
 }
 
+void StackerUI::reCompile() {
+  appConnection->reCompile();
+}
 
 void StackerUI::generateCode(const bool fullMode) {
   GenerateCodeContext context;
@@ -787,8 +791,10 @@ void StackerUI::generateCode(const bool fullMode) {
 
     ref.validate();
   }
+
   if (fullMode) {
     appConnection->endCompile();
+    appConnection->reCompile();
   }
 }
 
@@ -837,7 +843,7 @@ void StackerUI::generatedCodeUI() {
   ImGui::SetNextWindowSize(ImVec2(400, 300), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowBgAlpha(1.0f);
 
-  ImGui::Begin("Stacker generated Code");
+  ImGui::Begin("Stacker generated Code", 0, ImGuiWindowFlags_NoCollapse);
 
   if (ImGui::Button("  New  ")) {
     freeData();
@@ -870,7 +876,10 @@ void StackerUI::generatedCodeUI() {
   std::string* code = appConnection->code();
   assert(code);
 
-  ImGui::InputTextMultiline("Code", (char*)code->c_str(), code->size(), ImVec2(-FLT_MIN, 300.0f), ImGuiInputTextFlags_ReadOnly);
+  ImGui::InputTextMultiline("Code", code, ImVec2(-FLT_MIN, 300.0f));
+  if (ImGui::Button("Compile from above")) {
+    reCompile();
+  }
   ImGui::TextUnformatted("Warnings / Errors");
   const char* warningsAndErrors = appConnection->getWarningsAndErrors();
   ImGui::InputTextMultiline("Warnings / Errors", (char*)warningsAndErrors, 0, ImVec2(-FLT_MIN, 0.0f), ImGuiInputTextFlags_ReadOnly);
@@ -884,7 +893,7 @@ void StackerUI::propertiesUI() {
   ImGui::SetNextWindowBgAlpha(1.0f);
 
   // todo: make UI not in a window so it can be combined with other UI
-  ImGui::Begin("Stacker Properties");
+  ImGui::Begin("Stacker Properties", 0, ImGuiWindowFlags_NoCollapse);
 
   for (auto it = selectedObjects.begin(); it != selectedObjects.end(); ++it) {
     const uint32 index = *it;

@@ -148,17 +148,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\CppStackerBox.cpp" />
+    <ClCompile Include="..\EmscriptenImgui\webMain.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\external\imgui\imgui.cpp" />
     <ClCompile Include="..\external\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\imgui\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\external\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="..\external\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\ShaderBox.cpp" />
     <ClCompile Include="..\StackerDemo.cpp" />
     <ClCompile Include="..\StackerUI.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="winMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CppStackerBox.h" />
@@ -168,6 +173,7 @@
     <ClInclude Include="..\external\imgui\imgui_impl_opengl3.h" />
     <ClInclude Include="..\external\imgui\imgui_impl_opengl3_loader.h" />
     <ClInclude Include="..\external\imgui\imgui_internal.h" />
+    <ClInclude Include="..\external\imgui\imgui_stdlib.h" />
     <ClInclude Include="..\external\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\external\imgui\imstb_textedit.h" />
     <ClInclude Include="..\external\imgui\imstb_truetype.h" />
@@ -184,6 +190,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\EmscriptenImgui\Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

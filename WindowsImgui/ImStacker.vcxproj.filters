@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="..\external\imgui\imgui_impl_opengl3.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -34,6 +33,11 @@
     </ClCompile>
     <ClCompile Include="..\ShaderBox.cpp">
       <Filter>imstacker</Filter>
+    </ClCompile>
+    <ClCompile Include="winMain.cpp" />
+    <ClCompile Include="..\EmscriptenImgui\webMain.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_stdlib.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +88,9 @@
     <ClInclude Include="..\ShaderBox.h">
       <Filter>imstacker</Filter>
     </ClInclude>
+    <ClInclude Include="..\external\imgui\imgui_stdlib.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\external\glfw\lib-vc2019\glfw3dll.lib">
@@ -101,5 +108,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\EmscriptenImgui\Makefile" />
   </ItemGroup>
 </Project>

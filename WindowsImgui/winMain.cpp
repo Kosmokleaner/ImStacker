@@ -34,6 +34,8 @@ unsigned int RGBSwizzle(unsigned int c) {
 
 int main(int, char**)
 {
+  printf("winMain\n");
+
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
   if (!glfwInit())
@@ -145,7 +147,6 @@ int main(int, char**)
   //IM_ASSERT(font != NULL);
 
   // Our state
-  bool show_demo_window = true;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Main loop
@@ -163,21 +164,8 @@ int main(int, char**)
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window)
-      ImGui::ShowDemoWindow(&show_demo_window);
-
     void stacker_demo();
     stacker_demo();
-
-
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-    {
-      ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-      ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-      ImGui::End();
-    }
 
     // Rendering
     ImGui::Render();

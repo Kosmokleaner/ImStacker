@@ -132,6 +132,7 @@ public:
   virtual const char* getWarningsAndErrors() { return warningsAndErrors.c_str(); }
   virtual void startCompile();
   virtual void endCompile();
+  virtual void reCompile();
   virtual std::string* code() { return &generatedCode; }
 };
 

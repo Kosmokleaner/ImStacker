@@ -131,11 +131,13 @@ void CppAppConnection::startCompile() {
   generatedCode += fragment_shader_text0;
 
 }
-
 void CppAppConnection::endCompile() {
   // trim right
   generatedCode.erase(generatedCode.find_last_not_of("\t ") + 1);
   generatedCode += fragment_shader_text1;
+}
+
+void CppAppConnection::reCompile() {
   recompileShaders(generatedCode.c_str(), warningsAndErrors);
 }
 
@@ -439,7 +441,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_RGBOutput && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float4);
-      sprintf_s(str, sizeof(str), "FragColor = v%d", paramVIndex);
+      sprintf_s(str, sizeof(str), "  ret = v%d", paramVIndex);
       *context.code += str;
       sprintf_s(str, sizeof(str), "; // %s\n", name.c_str());
       *context.code += str;

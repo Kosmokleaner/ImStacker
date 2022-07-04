@@ -6,14 +6,22 @@
   #define IMGL3W_IMPL
 #endif
 
+
+#ifdef __EMSCRIPTEN__
+#include "SDL.h"
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#include "SDL_opengles2.h"
+#else
 #include <imgui_impl_opengl3_loader.h>
+#endif
 
 #ifdef EMSCRIPTEN
 const char* vertex_shader_text =
-"#version 110\n"
+"precision mediump float;\n"
 "attribute vec3 aPos; // the position variable has attribute position 0\n"
 "\n"
-"out vec4 vertexColor;\n"
+"varying vec4 vertexColor;\n"
 "\n"
 "void main()\n"
 "{\n"
@@ -23,20 +31,19 @@ const char* vertex_shader_text =
 "\n";
 
 const char* fragment_shader_text0 =
-"#version 110\n"
-"#ifdef GL_ES\n"
-"    precision mediump float;\n"
-"#endif\n"
+"precision mediump float;\n"
 "\n"
 "uniform mat4 uniform0;\n"
-"in vec4 vertexColor; // from vertex shader\n"
-"in vec4 gl_FragCoord; // (pixel.x+0.5, pixel.y+0.5, z, w)\n"
+"varying vec4 vertexColor; // from vertex shader\n"
 "\n"
 "void main()\n"
 "{\n"
-"  uvec2 checker2 = uvec2(gl_FragCoord.xy / 16.0);\n"
-"  uint checker1 = (checker2.x & 1u) ^ (checker2.y & 1u);\n"
-"  FragColor = vec4(1.0, 1.0f, 1.0, 1.0) * mix(0.45f, 0.55f, checker1);\n\n";
+"  vec4 ret = vec4(0.0, 1.0, 0.0, 1.0);\n\n";
+
+const char* fragment_shader_text1 =
+"  gl_FragColor = ret;\n"
+"}\n"
+"\n";
 
 #else
 const char* vertex_shader_text =
@@ -64,12 +71,14 @@ const char* fragment_shader_text0 =
 "{\n"
 "  uvec2 checker2 = uvec2(gl_FragCoord.xy / 16.0);\n"
 "  uint checker1 = (checker2.x & 1u) ^ (checker2.y & 1u);\n"
-"  FragColor = vec4(1.0, 1.0f, 1.0, 1.0) * mix(0.45f, 0.55f, checker1);\n\n";
-#endif
+"  vec4 ret = vec4(1.0, 1.0f, 1.0, 1.0) * mix(0.45f, 0.55f, checker1);\n\n";
 
 const char* fragment_shader_text1 =
+"  FragColor = ret;\n"
 "}\n"
 "\n";
+#endif
+
 
 
 #if SHADER_SUPPORT == 1
@@ -128,24 +137,30 @@ void recompileShaders(const char* inCode, std::string& warningsAndErrors) {
   assert(inCode);
 
   GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
   const char* ptr = inCode;
   glShaderSource(fragment_shader, 1, &ptr, NULL);
+
   glCompileShader(fragment_shader);
 
-
   g_program = glCreateProgram();
-  glAttachShader(g_program, vertex_shader);
+
   glAttachShader(g_program, fragment_shader);
-  glLinkProgram(g_program);
 
-  uniform0 = glGetUniformLocation(g_program, "uniform0");
-  assert(uniform0 >= 0);
+  if (vertex_shader != -1) {
+    glAttachShader(g_program, vertex_shader);
+    glLinkProgram(g_program);
 
-  checkProgram(g_program, GL_LINK_STATUS, "program", warningsAndErrors);
+    uniform0 = glGetUniformLocation(g_program, "uniform0");
+    assert(uniform0 >= 0);
+
+    checkProgram(g_program, GL_LINK_STATUS, "program", warningsAndErrors);
+  }
 }
 
 static void init() {
   vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+
   glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
   glCompileShader(vertex_shader);
 
@@ -230,9 +245,6 @@ void drawDemo(int width, int height) {
   //    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
   glUseProgram(0);
-  //    ImGui::Begin("Hello GLSL");                          // Create a window called "Hello, world!" and append into it.
-  //    ImGui::Text("Test");
-  //    ImGui::End();
 }
 
 #else // SHADER_SUPPORT == 1
