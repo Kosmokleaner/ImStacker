@@ -290,6 +290,18 @@ void StackerUI::panelUI() {
     clipboardCut();
   }
 
+  if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
+    if (ImGui::IsKeyPressed('X', true)) {
+      clipboardCut();
+    }
+    if (ImGui::IsKeyPressed('C', true)) {
+      clipboardCopy();
+    }
+    if (ImGui::IsKeyPressed('V', true)) {
+      clipboardPaste();
+    }
+  }
+
   buildOrder();
 
   if (contextMenuIsOpen) {
