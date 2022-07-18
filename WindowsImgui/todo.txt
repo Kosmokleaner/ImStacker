@@ -2,7 +2,6 @@
 
 * ScreenUV -> Frac -> RGBOutput fails
 * tooltip when hovering over box
-* pow(x, y)
 * show yellow (warning) X if a node output is needs to be connected
 * make function
 * screen/window size

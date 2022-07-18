@@ -205,6 +205,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
     ENTRY(CppStackerBox, NT_Sub, "Sub", "Subtract two numbers or negate one number");
     ENTRY(CppStackerBox, NT_Mul, "Mul", "Multiple multiple numbers");
     ENTRY(CppStackerBox, NT_Div, "Div", "Divide two numbers, 1/x a single number");
+    ENTRY(CppStackerBox, NT_Pow, "Pow", "Raise x to the power of y = x^y");
     ENTRY(CppStackerBox, NT_Lerp, "Lerp", "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
     ENTRY(CppStackerBox, NT_Dot, "Dot", "like HLSL dot(a, b), dot(a,a) if there is no b");
     ENTRY(CppStackerBoxSwizzle, NT_Swizzle, "Swizzle", "like UE4, ComponentMask and AppendVector x,y,z,w");
@@ -539,8 +540,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
 
   // divide
   if (nodeType == NT_Div) {
-    if(context.params.size() == 1) {
-      // 1/b
+    if (context.params.size() == 1) {
+      // 1/b (works with float, vec2, vec3, vec4)
       if (context.code) {
         sprintf_s(str, sizeof(str), "%s v%d = 1.0f / v%d; // %s\n",
           getGLSLTypeName(dataType),
@@ -551,13 +552,35 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       }
       validate();
       return true;
-    } else if (context.params.size() == 2) {
+    }
+    else if (context.params.size() == 2) {
       // a/b
       if (context.code) {
         CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
         int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
         int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
         sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
+          getGLSLTypeName(dataType),
+          vIndex,
+          param0VIndex,
+          param1VIndex,
+          name.c_str());
+        *context.code += str;
+      }
+      validate();
+      return true;
+    }
+  }
+
+  // Power x^y
+  if (nodeType == NT_Pow) {
+    if (context.params.size() == 2) {
+      // x^y
+      if (context.code) {
+        CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
+        int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
+        int32 param1VIndex = param1.castTo(context, EDT_Float);
+        sprintf_s(str, sizeof(str), "%s v%d = pow(v%d, v%d); // %s\n",
           getGLSLTypeName(dataType),
           vIndex,
           param0VIndex,
@@ -615,7 +638,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     return true;
   }
 
-  // 1-x
+  // 1-x (works with float, vec2, vec3, vec4)
   if (nodeType == NT_OneMinusX && context.params.size() == 1) {
     if (context.code) {
       sprintf_s(str, sizeof(str), "%s v%d = 1.0f - v%d; // %s\n",
