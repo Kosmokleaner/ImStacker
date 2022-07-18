@@ -294,13 +294,13 @@ void StackerUI::panelUI() {
   }
 
   if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl)) {
-    if (ImGui::IsKeyPressed('X', true)) {
+    if (ImGui::IsKeyPressed('X', false)) {
       clipboardCut();
     }
-    if (ImGui::IsKeyPressed('C', true)) {
+    if (ImGui::IsKeyPressed('C', false)) {
       clipboardCopy();
     }
-    if (ImGui::IsKeyPressed('V', true)) {
+    if (ImGui::IsKeyPressed('V', false)) {
       clipboardPaste(mousePosX, mousePosY);
     }
   }
