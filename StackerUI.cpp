@@ -248,7 +248,7 @@ void StackerUI::panelUI() {
 
   ImGuiIO& io = ImGui::GetIO();
 
-  ImGui::SetNextWindowPos(ImVec2(600, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSizeConstraints(ImVec2(300, 300), ImVec2(FLT_MAX, FLT_MAX));
   ImGui::SetNextWindowBgAlpha(1.0f);

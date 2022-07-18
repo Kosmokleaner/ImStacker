@@ -144,12 +144,12 @@ void CppAppConnection::reCompile() {
 void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRect& rect) {
 
 // @param className e.g. CppStackerBox
-#define ENTRY(className, inName, tooltip) \
-    if(ImGui::MenuItem(#inName, nullptr)) { \
+#define ENTRY(className, enumName, displayName, tooltip) \
+    if(ImGui::MenuItem(displayName, nullptr)) { \
         auto obj = new className(); \
-        obj->nodeType = NT_##inName; \
+        obj->nodeType = enumName; \
         obj->rect = rect; \
-        obj->name = #inName; \
+        obj->name = displayName; \
         stackerUI.addFromUI(*obj); \
     } \
     imguiToolTip(tooltip);
@@ -176,10 +176,10 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   //  ENTRY_CONSTANT(Vec4 Constant, CppStackerBoxConstant::ECT_Float4, "Float4 constant");
   //  ENTRY_CONSTANT(RGB Constant, CppStackerBoxConstant::ECT_ColorRGB, "Color RGB constant");
   //  ENTRY_CONSTANT(RGBA Constant, CppStackerBoxConstant::ECT_RGBA, "Color RGBA constant");
-    ENTRY(CppStackerBox, FragCoord, "see OpenGL gl_FragCoord");
-    ENTRY(CppStackerBox, ScreenUV, "screen xy in 0..1 range");
-    ENTRY(CppStackerBox, Rand, "float random in 0..1 range");
-    ENTRY(CppStackerBox, Time, "float time in seconds (precision loss when large)");
+    ENTRY(CppStackerBox, NT_FragCoord, "FragCoord", "see OpenGL gl_FragCoord");
+    ENTRY(CppStackerBox, NT_ScreenUV, "ScreenUV", "screen xy in 0..1 range");
+    ENTRY(CppStackerBox, NT_Rand, "Rand", "float random in 0..1 range");
+    ENTRY(CppStackerBox, NT_Time, "Time", "float time in seconds (precision loss when large)");
     ImGui::Unindent();
   }
 
@@ -188,11 +188,12 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   {
     ImGui::TextDisabled("One input");
     ImGui::Indent();
-    ENTRY(CppStackerBox, Sin, "Sin() in radiants");
-    ENTRY(CppStackerBox, Cos, "Cos() in radiants");
-    ENTRY(CppStackerBox, Frac, "like HLSL frac() = x-floor(x)");
-    ENTRY(CppStackerBox, Saturate, "like HLSL saturate(), clamp betwen 0 and 1)");
-    ENTRY(CppStackerBox, Sqrt, "like HLSL sqrt(), square root");
+    ENTRY(CppStackerBox, NT_Sin, "Sin", "Sin() in radiants");
+    ENTRY(CppStackerBox, NT_Cos, "Cos", "Cos() in radiants");
+    ENTRY(CppStackerBox, NT_Frac, "Frac", "like HLSL frac() = x - floor(x)");
+    ENTRY(CppStackerBox, NT_Saturate, "Saturate", "like HLSL saturate(), clamp betwen 0 and 1)");
+    ENTRY(CppStackerBox, NT_Sqrt, "Sqrt", "like HLSL sqrt(), square root");
+    ENTRY(CppStackerBox, NT_OneMinusX, "1-x", "like HLSL sqrt(), square root");
     ImGui::Unindent();
   }
   ImGui::Separator();
@@ -200,14 +201,14 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
   {
     ImGui::TextDisabled("Two or more inputs");
     ImGui::Indent();  
-    ENTRY(CppStackerBox, Add, "Sum up multiple inputs of same type");
-    ENTRY(CppStackerBox, Sub, "Subtract two numbers or negate one number");
-    ENTRY(CppStackerBox, Mul, "Multiple multiple numbers");
-    ENTRY(CppStackerBox, Div, "Divide two numbers, 1/x a single number");
-    ENTRY(CppStackerBox, Lerp, "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
-    ENTRY(CppStackerBox, Dot, "like HLSL dot(a, b), dot(a,a) if there is no b");
-    ENTRY(CppStackerBoxSwizzle, Swizzle, "like UE4, ComponentMask and AppendVector x,y,z,w");
-    ENTRY(CppStackerBox, RGBOutput, "output vec4 as postprocess RGB color (Alpha is ignored)");
+    ENTRY(CppStackerBox, NT_Add, "Add", "Sum up multiple inputs of same type");
+    ENTRY(CppStackerBox, NT_Sub, "Sub", "Subtract two numbers or negate one number");
+    ENTRY(CppStackerBox, NT_Mul, "Mul", "Multiple multiple numbers");
+    ENTRY(CppStackerBox, NT_Div, "Div", "Divide two numbers, 1/x a single number");
+    ENTRY(CppStackerBox, NT_Lerp, "Lerp", "like HLSL lerp(x0,x1,a) = x0*(1-a) + x1*a, linear interpolation");
+    ENTRY(CppStackerBox, NT_Dot, "Dot", "like HLSL dot(a, b), dot(a,a) if there is no b");
+    ENTRY(CppStackerBoxSwizzle, NT_Swizzle, "Swizzle", "like UE4, ComponentMask and AppendVector x,y,z,w");
+    ENTRY(CppStackerBox, NT_RGBOutput, "RGBOutput", "output vec4 as postprocess RGB color (Alpha is ignored)");
     ImGui::Unindent();
   }
 
@@ -607,6 +608,20 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
+        name.c_str());
+      *context.code += str;
+    }
+    validate();
+    return true;
+  }
+
+  // 1-x
+  if (nodeType == NT_OneMinusX && context.params.size() == 1) {
+    if (context.code) {
+      sprintf_s(str, sizeof(str), "%s v%d = 1.0f - v%d; // %s\n",
+        getGLSLTypeName(dataType),
+        vIndex,
+        param0.vIndex,
         name.c_str());
       *context.code += str;
     }

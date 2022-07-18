@@ -28,7 +28,7 @@ enum EDataType {
 enum ENodeType {
   NT_Unknown,
   NT_IntVariable, NT_FloatVariable,
-  NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp, NT_Dot, NT_Sqrt,
+  NT_Add, NT_Sub, NT_Mul, NT_Div, NT_Sin, NT_Cos, NT_Frac, NT_Saturate, NT_Lerp, NT_Dot, NT_Sqrt, NT_OneMinusX,
   NT_Swizzle, // like UE4 ComponentMask and Append in one
   NT_Rand,
   NT_Time,
@@ -44,7 +44,7 @@ inline const char* enumToCStr(const ENodeType nodeType) {
   const char* tab[] = {
       "Unknown",
       "IntVariable", "FloatVariable",
-      "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp", "Dot", "Sqrt",
+      "Add", "Sub", "Mul", "Div", "Sin", "Cos", "Frac", "Saturate", "Lerp", "Dot", "Sqrt", "1-x",
       "Swizzle",
       "Rand",
       "Time",
