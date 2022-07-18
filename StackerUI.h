@@ -173,9 +173,13 @@ public:
     //
     void clipboardCopy();
     //
-    void clipboardPaste();
+    // @param mousePosX in grid cells
+    // @param mousePosY in grid cells
+    void clipboardPaste(const int32 mousePosX, const int32 mousePosY);
     //
-    void cutCopyPasteMenu();
+    // @param mousePosX in grid cells
+    // @param mousePosY in grid cells
+    void cutCopyPasteMenu(const int32 mousePosX, const int32 mousePosY);
 
 private:
     IAppConnection nullAppConnection;
@@ -230,5 +234,5 @@ private:
     // @param what indices into stackerBoxes[]
     void saveToBuffer(rapidjson::StringBuffer& strbuf, const std::vector<int32>& what);
     //
-    bool loadFromBuffer(const std::vector<char>& fileBlob);
+    bool loadFromBuffer(const std::vector<char>& fileBlob, bool select);
 };

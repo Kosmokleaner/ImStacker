@@ -73,7 +73,7 @@ void StackerUI::reset() {
   order.clear();
 }
 
-bool StackerUI::loadFromBuffer(const std::vector<char>& fileBlob) {
+bool StackerUI::loadFromBuffer(const std::vector<char>& fileBlob, bool select) {
   reset();
 
   Document d;
@@ -109,6 +109,9 @@ bool StackerUI::loadFromBuffer(const std::vector<char>& fileBlob) {
       const char* typeName = ref["type"].GetString();
 
       if (StackerBox* node = appConnection->createNode(typeName)) {
+        if (select) {
+          selectedObjects.push_back((int32)stackerBoxes.size());
+        }
         stackerBoxes.push_back(node);
         if (!node->load(ref)) {
           break;
@@ -159,7 +162,7 @@ StackerUI::~StackerUI() {
   freeData();
 }
 
-void StackerUI::cutCopyPasteMenu() {
+void StackerUI::cutCopyPasteMenu(const int32 mousePosX, const int32 mousePosY) {
   if (ImGui::MenuItem("Cut", "CTRL+X", nullptr, !selectedObjects.empty())) {
     clipboardCut();
   }
@@ -168,7 +171,7 @@ void StackerUI::cutCopyPasteMenu() {
   }
   const char* txt = ImGui::GetClipboardText();
   if (ImGui::MenuItem("Paste", "CTRL+V", nullptr, txt && *txt)) {
-    clipboardPaste();
+    clipboardPaste(mousePosX, mousePosY);
   }
 }
 
@@ -210,7 +213,7 @@ void StackerUI::contextMenu(const int32 mousePosX, const int32 mousePosY) {
       appConnection->openContextMenu(*this, stackerBoxRect);
     }
     else {
-      cutCopyPasteMenu();
+      cutCopyPasteMenu(mousePosX, mousePosY);
     }
     contextMenuIsOpen = true;
     ImGui::EndPopup();
@@ -298,7 +301,7 @@ void StackerUI::panelUI() {
       clipboardCopy();
     }
     if (ImGui::IsKeyPressed('V', true)) {
-      clipboardPaste();
+      clipboardPaste(mousePosX, mousePosY);
     }
   }
 
@@ -517,7 +520,7 @@ void StackerUI::clipboardCopy() {
   ImGui::SetClipboardText(strbuf.GetString());
 }
 
-void StackerUI::clipboardPaste() {
+void StackerUI::clipboardPaste(const int32 mousePosX, const int32 mousePosY) {
   const char* fileData = ImGui::GetClipboardText();
   if (!fileData)
     return;
@@ -526,7 +529,20 @@ void StackerUI::clipboardPaste() {
   memcpy(temp.data(), fileData, temp.size());
   temp[temp.size() - 1] = 0;
   // no error handling, a lot of clipboard content will not work
-  loadFromBuffer(temp);
+  loadFromBuffer(temp, true);
+
+  int32 minX = 0xfffffff, minY = 0xfffffff;
+  for (auto it = selectedObjects.rbegin(); it != selectedObjects.rend(); ++it) {
+    auto& ref = *stackerBoxes[*it];
+    minX = std::min(minX, ref.rect.x);
+    minY = std::min(minY, ref.rect.y);
+  }
+  for (auto it = selectedObjects.rbegin(); it != selectedObjects.rend(); ++it) {
+    auto& ref = *stackerBoxes[*it];
+    ref.rect.x += mousePosX - minX;
+    ref.rect.y += mousePosY - minY;
+  }
+
   dirty = true;
 }
 
@@ -838,7 +854,7 @@ bool StackerUI::load(const char* fileName) {
     bool ok = fread(fileData.data(), fileData.size(), 1, out) == 1;
     // todo: better error handling
     assert(ok);
-    ok = loadFromBuffer(fileData);
+    ok = loadFromBuffer(fileData, false);
     // todo: better error handling
     assert(ok);
     fclose(out);

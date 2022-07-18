@@ -6,7 +6,6 @@
 * make function
 * screen/window size
 * utility functions e.g. sphereMask, length
-* paste should insert where cursor is
 * separate visuals from coding e.g. make it a roadmap tool
 * see inbetween values as color / image / number
 * comment box behind nodes, move nodes with it

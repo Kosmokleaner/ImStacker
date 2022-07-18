@@ -216,7 +216,7 @@ void CppAppConnection::openContextMenu(StackerUI& stackerUI, const StackerBoxRec
 #undef ENTRY
 
   ImGui::Separator();
-  stackerUI.cutCopyPasteMenu();
+  stackerUI.cutCopyPasteMenu(rect.x, rect.y);
 }
 
 const char* getGLSLTypeName(const EDataType dataType) {
