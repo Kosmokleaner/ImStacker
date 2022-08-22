@@ -381,19 +381,18 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     validate();
     if (context.code) {
       int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
-      sprintf_s(str, sizeof(str), "%s v%d = v%d",
+      // todo: implement max Parameter count
+      int32 paramNVIndex[16];
+      for (size_t i = 1, count = context.params.size(); i < count; ++i) {
+        paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
+      }
+      sprintf_s(str, sizeof(str), "  %s v%d = v%d",
         getGLSLTypeName(dataType),
         vIndex,
         param0VIndex);
       validate();
       *context.code += str;
       
-      // todo: implement max Parameter count
-      int32 paramNVIndex[16];
-      for (size_t i = 1, count = context.params.size(); i < count; ++i) {
-        paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
-      }
-
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
         sprintf_s(str, sizeof(str), " + v%d",
           paramNVIndex[i]);
@@ -455,17 +454,16 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Mul) {
     if (context.code) {
       int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
-      sprintf_s(str, sizeof(str), "%s v%d = v%d",
-        getGLSLTypeName(dataType),
-        vIndex,
-        param0VIndex);
-      *context.code += str;
-
       // todo: implement max Parameter count
       int32 paramNVIndex[16];
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
         paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
       }
+      sprintf_s(str, sizeof(str), "  %s v%d = v%d",
+        getGLSLTypeName(dataType),
+        vIndex,
+        param0VIndex);
+      *context.code += str;
 
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
         sprintf_s(str, sizeof(str), " * v%d",
@@ -611,11 +609,11 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   // Frac
   if (nodeType == NT_Frac && context.params.size() == 1) {
     if (context.code) {
-      int32 paramVIndex = param0.castTo(context, EDT_Float);
+//      int32 paramVIndex = param0.castTo(context, EDT_Float);
       sprintf_s(str, sizeof(str), "%s v%d = fract(v%d); // %s\n",
         getGLSLTypeName(dataType),
         vIndex,
-        paramVIndex,
+        param0.vIndex,
         name.c_str());
       *context.code += str;
     }

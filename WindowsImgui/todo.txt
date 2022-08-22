@@ -1,4 +1,7 @@
 
+* drag if height = 1 should also scale up if new pos is smaller y
+* web version is scaled and doesn't fill full window (stacker4 shows grid)
+* indentation for add and mul is wrong
 
 * ScreenUV -> Frac -> RGBOutput fails
 * tooltip when hovering over box
@@ -7,8 +10,9 @@
 * screen/window size
 * utility functions e.g. sphereMask, length
 * separate visuals from coding e.g. make it a roadmap tool
-* see inbetween values as color / image / number
+* see temporary values as color / image / number
 * comment box behind nodes, move nodes with it
+* if box height is 1, top should scale when moved up
 
 // todo:
 // * properties in line ?
