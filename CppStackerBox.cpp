@@ -56,25 +56,25 @@ int32 CppStackerBox::castTo(GenerateCodeContext& context, const EDataType dstDat
 
     // cast int:float
     // ivec2:vec2, ivec3:vec3, ivec4:vec4, float->vec2, float->vec3, float->vec4
-    const char* fmt = "%s v%d = %s(v%d);\n%s\n";
+    const char* fmt = "%s%s v%d = %s(v%d);\n";
 
     // expand by one
     if((dataType == EDT_Float && dstDataType == EDT_Float2)
     || (dataType == EDT_Float2 && dstDataType == EDT_Float3)
     || (dataType == EDT_Float3 && dstDataType == EDT_Float4))
-      fmt = "%s v%d = %s(v%d, 0);\n%s\n";
+      fmt = "%s%s v%d = %s(v%d, 0);\n";
 
     // expand by two
     if((dataType == EDT_Float && dstDataType == EDT_Float3)
       || (dataType == EDT_Float2 && dstDataType == EDT_Float4))
-      fmt = "%s v%d = %s(v%d, 0, 0);\n%s\n";
+      fmt = "%s%s v%d = %s(v%d, 0, 0);\n";
 
     sprintf_s(str, sizeof(str), fmt,
+      context.indentationStr,
       dstDataTypeStr,
       context.nextFreeVIndex,
       dstDataTypeStr,
-      vIndex,
-      context.indentationStr);
+      vIndex);
 
     *context.code += str;
   }
@@ -305,7 +305,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_FragCoord && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float4;
-      sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord; // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = gl_FragCoord; // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         name.c_str());
@@ -318,7 +319,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_ScreenUV && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float2;
-      sprintf_s(str, sizeof(str), "%s v%d = gl_FragCoord.xy * uniform0[1].zw; // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = gl_FragCoord.xy * uniform0[1].zw; // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         name.c_str());
@@ -331,7 +333,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Rand && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float;
-      sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][0]; // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = uniform0[0][0]; // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         name.c_str());
@@ -344,7 +347,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Time && context.params.size() == 0) {
     if (context.code) {
       dataType = EDT_Float;
-      sprintf_s(str, sizeof(str), "%s v%d = uniform0[0][1]; // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = uniform0[0][1]; // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         name.c_str());
@@ -386,7 +390,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
         paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
       }
-      sprintf_s(str, sizeof(str), "  %s v%d = v%d",
+      sprintf_s(str, sizeof(str), "%s%s v%d = v%d",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         param0VIndex);
@@ -411,7 +416,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     // unary minus to negate
     if(context.params.size() == 1) {
       if (context.code) {
-        sprintf_s(str, sizeof(str), "%s v%d = v%d; // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = v%d; // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0.vIndex,
@@ -426,7 +432,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
         int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
         int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
-        sprintf_s(str, sizeof(str), "%s v%d = v%d - v%d; // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = v%d - v%d; // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0VIndex,
@@ -442,7 +449,7 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_RGBOutput && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float4);
-      sprintf_s(str, sizeof(str), "  ret = v%d", paramVIndex);
+      sprintf_s(str, sizeof(str), "%sret = v%d", context.indentationStr, paramVIndex);
       *context.code += str;
       sprintf_s(str, sizeof(str), "; // %s\n", name.c_str());
       *context.code += str;
@@ -459,7 +466,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       for (size_t i = 1, count = context.params.size(); i < count; ++i) {
         paramNVIndex[i] = upgradeTypeIfNeeded(context, dataType, (CppStackerBox&)*context.params[i]);
       }
-      sprintf_s(str, sizeof(str), "  %s v%d = v%d",
+      sprintf_s(str, sizeof(str), "%s%s v%d = v%d",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         param0VIndex);
@@ -484,7 +492,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       // dot product with itself
       dataType = EDT_Float;
       if (context.code) {
-        sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = dot(v%d, v%d); // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0.vIndex,
@@ -503,7 +512,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
         int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
         int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
-        sprintf_s(str, sizeof(str), "%s v%d = dot(v%d, v%d); // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = dot(v%d, v%d); // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0VIndex,
@@ -525,7 +535,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       if (dataType == EDT_Void)
         return false;
 
-      sprintf_s(str, sizeof(str), "%s v%d = (v%d).%s;\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = (v%d).%s;\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
@@ -541,7 +552,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
     if (context.params.size() == 1) {
       // 1/b (works with float, vec2, vec3, vec4)
       if (context.code) {
-        sprintf_s(str, sizeof(str), "%s v%d = 1.0f / v%d; // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = 1.0f / v%d; // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0.vIndex,
@@ -557,7 +569,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
         int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
         int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
-        sprintf_s(str, sizeof(str), "%s v%d = v%d / v%d; // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = v%d / v%d; // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0VIndex,
@@ -578,7 +591,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
         CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
         int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
         int32 param1VIndex = param1.castTo(context, EDT_Float);
-        sprintf_s(str, sizeof(str), "%s v%d = pow(v%d, v%d); // %s\n",
+        sprintf_s(str, sizeof(str), "%s%s v%d = pow(v%d, v%d); // %s\n",
+          context.indentationStr,
           getGLSLTypeName(dataType),
           vIndex,
           param0VIndex,
@@ -595,7 +609,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Saturate && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
-      sprintf_s(str, sizeof(str), "%s v%d = clamp(v%d, 0.0f, 1.0f); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = clamp(v%d, 0.0f, 1.0f); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
@@ -610,7 +625,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Frac && context.params.size() == 1) {
     if (context.code) {
 //      int32 paramVIndex = param0.castTo(context, EDT_Float);
-      sprintf_s(str, sizeof(str), "%s v%d = fract(v%d); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = fract(v%d); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
@@ -625,7 +641,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Sqrt && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
-      sprintf_s(str, sizeof(str), "%s v%d = sqrt(v%d); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = sqrt(v%d); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
@@ -639,7 +656,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   // 1-x (works with float, vec2, vec3, vec4)
   if (nodeType == NT_OneMinusX && context.params.size() == 1) {
     if (context.code) {
-      sprintf_s(str, sizeof(str), "%s v%d = 1.0f - v%d; // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = 1.0f - v%d; // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         param0.vIndex,
@@ -654,7 +672,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Sin && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
-      sprintf_s(str, sizeof(str), "%s v%d = sin(v%d); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = sin(v%d); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
@@ -669,7 +688,8 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
   if (nodeType == NT_Cos && context.params.size() == 1) {
     if (context.code) {
       int32 paramVIndex = param0.castTo(context, EDT_Float);
-      sprintf_s(str, sizeof(str), "%s v%d = cos(v%d); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = cos(v%d); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         paramVIndex,
@@ -689,7 +709,8 @@ bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
 
   if (context.code) {
     if (dataType == EDT_Float) {
-      sprintf_s(str, sizeof(str), "%s v%d = %f; // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = %f; // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         value.x,
@@ -697,7 +718,8 @@ bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
       *context.code += str;
     }
     else if (dataType == EDT_Float2) {
-      sprintf_s(str, sizeof(str), "%s v%d = vec2(%f, %f); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = vec2(%f, %f); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         value.x, value.y,
@@ -705,7 +727,8 @@ bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
       *context.code += str;
     }
     else if (dataType == EDT_Float3) {
-      sprintf_s(str, sizeof(str), "%s v%d = vec3(%f, %f, %f); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = vec3(%f, %f, %f); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         value.x, value.y, value.z,
@@ -713,7 +736,8 @@ bool CppStackerBoxConstant::generateCode(GenerateCodeContext& context) {
       *context.code += str;
     }
     else if(dataType == EDT_Float4) {
-      sprintf_s(str, sizeof(str), "%s v%d = vec4(%f, %f, %f, %f); // %s\n",
+      sprintf_s(str, sizeof(str), "%s%s v%d = vec4(%f, %f, %f, %f); // %s\n",
+        context.indentationStr,
         getGLSLTypeName(dataType),
         vIndex,
         value.x, value.y, value.z, value.w,

@@ -823,10 +823,6 @@ void StackerUI::generateCode(const bool fullMode) {
 
     ref.validate();
 
-    if (context.code) {
-      *context.code += context.indentationStr;
-    }
-
     ref.compileError = !ref.generateCode(context);
 
     ref.validate();
