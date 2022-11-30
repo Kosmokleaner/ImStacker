@@ -14,8 +14,7 @@ Live Web Demo:	http://www.kosmokleaner.de/temp/stacker4
 
 ImStacker is C++ code that implements a *simple graph editor* but while most such editors use lines to connect boxes we make use of the 2d location and use the stacking (hence the name) location to connect the boxes. This results in a more compact and visually less complex result (no crossed wires). The stacking concept was borrowed from a tool named Werkzeug developed by the demo coder group Farbrausch.
 
-<img src="https://user-images.githubusercontent.com/44132/204688890-95950d81-36e0-4aeb-a1ee-ab161d92d0ff.png" alt="drawing" width="45%"/>
-<img src="https://user-images.githubusercontent.com/44132/204688896-026b6150-0353-4704-87e3-33b9a14b8564.png" alt="drawing" width="45%"/>
+<img src="https://user-images.githubusercontent.com/44132/204688890-95950d81-36e0-4aeb-a1ee-ab161d92d0ff.png" alt="drawing" width="45%"/> <img src="https://user-images.githubusercontent.com/44132/204688896-026b6150-0353-4704-87e3-33b9a14b8564.png" alt="drawing" width="45%"/>
 Node graphs using lines can get messy when getting more complex.
 
 *ImStacker* is implemented on top of Dear ImGui which is a very popular UI library for desktop game development. The node data and connectivity is stored internally (stateful), but the UI part is immediate (stateless) making it work well with existing ImGui code. This is where the “Im” part of the name comes from.
@@ -146,15 +145,3 @@ A more interesting / animated example
 * **Art and technology of the demoscene**\
   https://www.youtube.com/watch?v=GswISjlquoU \
   How to work with “Tooll”, a spiritual successor of Werkzeug
-
-
-
-
-
-
-
-
-
-
-
-
