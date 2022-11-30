@@ -142,7 +142,7 @@ A more interesting / animated example
 
 
 ## Links
-* Art and technology of the demoscene\
+* **Art and technology of the demoscene**\
   https://www.youtube.com/watch?v=GswISjlquoU \
   How to work with “Tooll”, a spiritual successor of Werkzeug
 
