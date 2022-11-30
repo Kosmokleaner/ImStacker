@@ -54,7 +54,7 @@ A more interesting / animated example
   => To get wider reach within coder community and demo to anyone in minutes
 
 ## ImStacker design choices
-* *Stacker Panel window* (to create and place nodes)
+* **Stacker Panel window** (to create and place nodes)
   * Interactive for fast iteration, compile should be in background thread, not blocking UI
   * 2D visual grid and snapping to reduce urge to polish and simpler snapping
   * Nodes have rounded corners to indicate in / out, arrows to indicate flow (downwards)\
@@ -68,11 +68,11 @@ A more interesting / animated example
   * Multiple node selection (left mouse drag for box, shift for add / remove individuals)
   * Selection to copy / move / edit / delete multiple nodes
   * Red cross to show localized errors
-* *Properties window* (to editor node properties)\
+* **Properties window** (to editor node properties)\
   TODO
   * Node name as optional documentation (like variable name)
   * Data type
-* *Stacker Code window* (mostly needed during development)\
+* **Stacker Code window** (mostly needed during development)\
   TODO
   * UI for new / load / save
   * Show generated shader code for inspection
@@ -96,31 +96,31 @@ A more interesting / animated example
   * .. for more see todo.txt
 
 ## Classes
-* ImStacker:
-  * class StackerUI\
+* **ImStacker:**
+  * **class StackerUI**\
     To store the state and connect to the application
-  * class StackerBox\
+  * **class StackerBox**\
     Base class for the node
-  * struct IAppConnection\
+  * **struct IAppConnection**\
     to connect to the application e.g. compile graph / generate output 
-* ImStacker demo:
-  * class CppStackerBox : public StackerBox\
+* **ImStacker demo:**
+  * **class CppStackerBox** : public StackerBox\
     Node class implementing most functions
-  * class CppStackerBoxConstant : public CppStackerBox\
+  * **class CppStackerBoxConstant** : public CppStackerBox\
     Node class implementing a int / float / float2 / float3 / float4 constant
-  * class CppStackerBoxSwizzle : public CppStackerBox\
+  * **class CppStackerBoxSwizzle** : public CppStackerBox\
     Node class implementing a swizzle operation (glsl / hlsl operation)
-  * class CppAppConnection : public StackerUI::IAppConnection\
+  * **class CppAppConnection** : public StackerUI::IAppConnection\
     to implement compiling glsl code and rendering the output as background
 
 # Files
-* todo.txt\
+* **todo.txt**\
   Itemized tasks for future updates
-* winMain.cpp, ImStacker.vcproj\
+* **winMain.cpp, ImStacker.vcproj**\
   for running on Windows
-* webMain.cpp, makefile\
+* **webMain.cpp, makefile**\
   for running in the browser with Emscripten
-* Readme.me\
+* **Readme.me**\
   Markup documentation (single image for now, will be generated from this document)
 
 ## ImStacker Version History:
@@ -136,9 +136,9 @@ A more interesting / animated example
   * More Shader nodes, polished visuals
 
 ## Third Party / External Libraries
-* Dear ImGui User Interface library, MIT license
-* GLFW OpenGL OS abstraction, zlib/libpng license
-* RapidJson Serialization (Load / Save / Copy & Paste), MIT license
+* **Dear ImGui** User Interface library, MIT license
+* **GLFW** OpenGL OS abstraction, zlib/libpng license
+* **RapidJson** Serialization (Load / Save / Copy & Paste), MIT license
 
 
 ## Links
