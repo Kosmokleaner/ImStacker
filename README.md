@@ -16,14 +16,14 @@ ImStacker is C++ code that implements a *simple graph editor* but while most suc
 <img src="https://user-images.githubusercontent.com/44132/204688890-95950d81-36e0-4aeb-a1ee-ab161d92d0ff.png" alt="drawing" width="45%"/> <img src="https://user-images.githubusercontent.com/44132/204688896-026b6150-0353-4704-87e3-33b9a14b8564.png" alt="drawing" width="45%"/>\
 Node graphs using lines can get messy when getting more complex.
 
-*ImStacker* is implemented on top of Dear ImGui which is a very popular UI library for desktop game development. The node data and connectivity is stored internally (stateful), but the UI part is immediate (stateless) making it work well with existing ImGui code. This is where the “Im” part of the name comes from.
+**ImStacker** is implemented on top of Dear ImGui which is a very popular UI library for desktop game development. The node data and connectivity is stored internally (stateful), but the UI part is immediate (stateless) making it work well with existing ImGui code. This is where the “Im” part of the name comes from.
 
 <img src="https://user-images.githubusercontent.com/44132/204688968-f34a4af1-9126-452c-892e-01ca050b7ef6.png" alt="drawing" width="50%"/>\
 from https://github.com/ocornut/imgui
 
 ImStacker is meant to be usable for a wide range of applications (e.g. shader graph, 2D scripting languages, calculator, post processing graph, …) so it requires integration with code that defines node properties, the connectivity options and how the output is generated. We implemented a demo application for a simple GLSL shader graph editor.
 
-The *ImStacker demo* uses OpenGL and GLFW to be mostly platform independent. The 64Bit Windows OpenGL version can be compiled with Visual Studio. The 32Bit Webassembly version runs in most browsers and can be compiled with Emscripten (C++ to WebAssembly).
+The **ImStacker demo** uses OpenGL and GLFW to be mostly platform independent. The 64Bit Windows OpenGL version can be compiled with Visual Studio. The 32Bit Webassembly version runs in most browsers and can be compiled with Emscripten (C++ to WebAssembly).
 
 ![image5](https://user-images.githubusercontent.com/44132/204689029-bb97ced7-5598-40f2-a430-48e4830e9b4b.png)
 
@@ -33,7 +33,6 @@ All code so far was written by Martin Mittring and released under the MIT licens
 
 
 ## Examples
-
 You can get the best impression by seeing it live, try the following and experiment with it:
 
 <img src="https://user-images.githubusercontent.com/44132/204689068-47e523d2-d99f-46cb-8ca6-ff3b08c6a3a7.png" alt="drawing" width="50%"/>\
@@ -41,7 +40,6 @@ Hello World
 
 <img src="https://user-images.githubusercontent.com/44132/204689048-7fb1d0dd-0fdf-4920-ae12-2a38f0f8ebc1.png" alt="drawing" width="50%"/>\
 A more interesting / animated example
-
 
 
 ## Goals of ImStacker
