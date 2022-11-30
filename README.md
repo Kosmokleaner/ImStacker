@@ -9,7 +9,7 @@ The radial gradient was created interactively in less than a minute.
 Live Web Demo:	http://www.kosmokleaner.de/temp/stacker4 
 
 
-# What is ImStacker ?
+## What is ImStacker ?
 
 ImStacker is C++ code that implements a *simple graph editor* but while most such editors use lines to connect boxes we make use of the 2d location and use the stacking (hence the name) location to connect the boxes. This results in a more compact and visually less complex result (no crossed wires). The stacking concept was borrowed from a tool named Werkzeug developed by the demo coder group Farbrausch.
 
@@ -32,7 +32,7 @@ The code was implemented to demonstrate and refine the idea and is work in progr
 All code so far was written by Martin Mittring and released under the MIT license. That should make integration in other projects easy.
 
 
-# Examples
+## Examples
 
 You can get the best impression by seeing it live, try the following and experiment with it:
 
@@ -45,7 +45,7 @@ A more interesting / animated example
 
 
 
-# Goals of ImStacker
+## Goals of ImStacker
 * Simple implementation over performance and production quality
   => For fast code iteration, no localization or polished visuals
 * Simple to integrate
@@ -53,7 +53,102 @@ A more interesting / animated example
 * Live web GL demo
   => To get wider reach within coder community and demo to anyone in minutes
 
-# ImStacker design choices
+## ImStacker design choices
+* *Stacker Panel window* (to create and place nodes)
+  * Interactive for fast iteration, compile should be in background thread, not blocking UI
+  * 2D visual grid and snapping to reduce urge to polish and simpler snapping
+  * Nodes have rounded corners to indicate in / out, arrows to indicate flow (downwards)
+    TODO    
+  * Data flow type between is nodes is cast if possible. This needs more polish / testing.
+  * Resize handles
+  * Visuals: left and right handles
+  * Function: 4 corners to resize element + center to move
+  * Right mouse button / Context menu (Cut Copy Paste), Create new node
+    TODO
+  * Multiple node selection (left mouse drag for box, shift for add / remove individuals)
+  * Selection to copy / move / edit / delete multiple nodes
+  * Red cross to show localized errors
+* *Properties window* (to editor node properties)
+  TODO
+  * Node name as optional documentation (like variable name)
+  * Data type
+* *Stacker Code window* (mostly needed during development)
+  TODO
+  * UI for new / load / save
+  * Show generated shader code for inspection
+  * The generated code is editable to quickly iterate on shader errors without restart.
+
+# Future
+* Fix bugs e.g.
+  * Overlapping nodes are not selected correctly
+  * Some data types are not propagated correctly
+* Polish UI
+  * Web preview background is not filling the full window
+  * StackerCode window resize has no effect on window elements
+  * Show data type between nodes
+  * Undo / Redo (can use existing serialization)
+* Make production usable
+  * Key bindings to creates common nodes faster
+  * We need variables to reuse data easier
+  * We need functions to hide complexity with a simple interface
+  * Automated unit and integration tests
+  * Need driving application[s]
+  * .. for more see todo.txt
+
+## Classes
+* ImStacker:
+  * class StackerUI
+    To store the state and connect to the application
+  * class StackerBox
+    Base class for the node
+  * struct IAppConnection
+    to connect to the application e.g. compile graph / generate output 
+* ImStacker demo:
+  * class CppStackerBox : public StackerBox
+    Node class implementing most functions
+  * class CppStackerBoxConstant : public CppStackerBox
+    Node class implementing a int / float / float2 / float3 / float4 constant
+  * class CppStackerBoxSwizzle : public CppStackerBox
+    Node class implementing a swizzle operation (glsl / hlsl operation)
+  * class CppAppConnection : public StackerUI::IAppConnection
+    to implement compiling glsl code and rendering the output as background
+
+# Files
+* todo.txt
+  Itemized tasks for future updates
+* winMain.cpp, ImStacker.vcproj
+  for running on Windows
+* webMain.cpp, makefile
+  for running in the browser with Emscripten
+* Readme.me
+  Markup documentation (single image for now, will be generated from this document)
+
+## ImStacker Version History:
+* V0.1
+  Cloned Windows ImGui demo project
+  ImStacker state internals, basic UI
+  Added math demo (Basic function)
+* V0.3
+  Serialization (Load / Save / Copy & Paste)
+  Added OpenGL shader demo (ShaderToy inspired)
+* V0.5
+  Web browser through Emscripten
+  More Shader nodes, polished visuals
+
+## Third Party / External Libraries
+* Dear ImGui User Interface library, MIT license
+* GLFW OpenGL OS abstraction, zlib/libpng license
+* RapidJson Serialization (Load / Save / Copy & Paste), MIT license
+
+
+## Links
+* Art and technology of the demoscene
+  https://www.youtube.com/watch?v=GswISjlquoU
+  How to work with “Tooll”, a spiritual successor of Werkzeug
+
+
+
+
 
 
 
