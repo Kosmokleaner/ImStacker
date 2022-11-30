@@ -1,3 +1,5 @@
+[![Docs](https://github.com/AMDResearch/omniperf/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://amdresearch.github.io/omniperf/) [![GitHub commits since last release](https://img.shields.io/github/commits-since/AMDResearch/omniperf/latest/dev.svg)](https://github.com/AMDResearch/omniperf/compare/main...dev) 
+
 # ImStacker V0.5
 
 ImStacker is a simple WIP node based graph editor without “wires” using the ImGui library. It runs on Windows and in the Browser. A demo is included. MIT license
