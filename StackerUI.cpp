@@ -378,10 +378,15 @@ void StackerUI::panelUI() {
         hoverHandleMask &= ~1;
       }
 
-
       // Top and bottom handle are disabled to make scale handles less often used by accident
       // and hightlight less noisy.
       if (hoverHandleMask == 0x1 || hoverHandleMask == 0x4) {
+        hoverHandleMask = 0;
+      }
+
+      // disable resize when multiple objects are selected, then we only move
+      // later we could also resize multiple objects together
+      if (selectedObjects.size() > 1) {
         hoverHandleMask = 0;
       }
     }
