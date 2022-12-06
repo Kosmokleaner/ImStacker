@@ -465,22 +465,38 @@ void StackerUI::panelUI() {
     else {
       auto& ref = *stackerBoxes[resizeObjectId];
 
+      // top
       if ((resizeHandleMask & 1) && ref.rect.height > deltaY) {
         ref.rect.y += deltaY;
         ref.rect.height -= deltaY;
         mouseDelta.y -= deltaY * scale;
         dirty = true;
       }
-      if ((resizeHandleMask & 2) && ref.rect.width > -deltaX) {
-        ref.rect.width += deltaX;
-        mouseDelta.x -= deltaX * scale;
-        dirty = true;
+
+      // right
+      {
+          // todo: expose, 3 is good to have scale and drag handles
+          const int minWidth = 3;
+
+          int adjustWidth = 0;
+
+          if ((resizeHandleMask & 2) && ref.rect.width > -deltaX) {
+            adjustWidth = -std::min(ref.rect.width - minWidth, -deltaX);
+          }
+          if(adjustWidth) {
+            ref.rect.width += adjustWidth;
+            mouseDelta.x -= adjustWidth * scale;
+            dirty = true;
+          }
       }
+
+      // bottom
       if ((resizeHandleMask & 4) && ref.rect.height > -deltaY) {
         ref.rect.height += deltaY;
         mouseDelta.y -= deltaY * scale;
         dirty = true;
       }
+      // left
       if ((resizeHandleMask & 8) && ref.rect.width > deltaX) {
         ref.rect.x += deltaX;
         ref.rect.width -= deltaX;

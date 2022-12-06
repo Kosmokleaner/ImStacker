@@ -2,7 +2,6 @@
 * drag if height = 1 should also scale up if new pos is smaller y
 * web version is scaled and doesn't fill full window (stacker4 shows grid)
 
-* ScreenUV -> Frac -> RGBOutput fails
 * tooltip when hovering over box
 * show yellow (warning) X if a node output is needs to be connected
 * make function
@@ -13,19 +12,25 @@
 * comment box behind nodes, move nodes with it
 * if box height is 1, top should scale when moved up
 
-// todo:
-// * properties in line ?
-//   e.g. double click to rename
-//   right mouse to edit properties
-//   left mouse to edit properties in popup
-// * load / save filename
-// * 2 demo windows
+Code style (can be chnaged, this is just how it started):
+* tabs size 2
+* { in line with for, while, if, ...
+* spaces between operators e.g. *, _, -, /
+* space after ,
 
-// polish / later
-// * undo/redo ?
-// * min box width should be at least 2 or 3 grid cells
-// * zoom in/out    io.MouseWheel
-// * set variable can have only one input but it can have 2 triangles
-// * ctrl-A to select all, menu item
-// * right mouse with minor mouse movement should still show context menu
-// * each cross should have tooltip with error
+todo:
+* properties in line ?
+  e.g. double click to rename
+  right mouse to edit properties
+  left mouse to edit properties in popup
+* load / save filename
+* 2 demo windows
+
+polish / later
+* undo/redo ?
+* min box width should be at least 2 or 3 grid cells
+* zoom in/out    io.MouseWheel
+* set variable can have only one input but it can have 2 triangles
+* ctrl-A to select all, menu item
+* right mouse with minor mouse movement should still show context menu
+* each cross should have tooltip with error
