@@ -510,8 +510,9 @@ bool CppStackerBox::generateCode(GenerateCodeContext& context) {
       dataType = EDT_Float;
       if (context.code) {
         CppStackerBox& param1 = (CppStackerBox&)*context.params[1];
-        int32 param0VIndex = upgradeTypeIfNeeded(context, dataType, param0);
-        int32 param1VIndex = upgradeTypeIfNeeded(context, dataType, param1);
+        EDataType max_input_type = std::max(param0.dataType, param1.dataType);
+        int32 param0VIndex = upgradeTypeIfNeeded(context, max_input_type, param0);
+        int32 param1VIndex = upgradeTypeIfNeeded(context, max_input_type, param1);
         sprintf_s(str, sizeof(str), "%s%s v%d = dot(v%d, v%d); // %s\n",
           context.indentationStr,
           getGLSLTypeName(dataType),
